@@ -8,3 +8,20 @@
 .status-tile:active{border-color:var(--accent);transform:translateY(1px)}
 @media(max-width:380px){.today-status{gap:6px}.status-tile{padding:11px 8px;min-height:100px}.status-tile .stat-label{font-size:8px}}
 .inline-form input[type=date],.field-label input[type=date],.date-compact{color-scheme:dark;min-width:0}
+
+/* Winter Arc refinement: weight labels, responsive date field, unified macro editor, status tiles */
+.weight-value{font-size:12px;font-weight:800;fill:#dcecf6;paint-order:stroke;stroke:#101722;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+.form-panel #workoutDate{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;appearance:none;-webkit-appearance:none;color-scheme:dark;padding:12px 10px}
+.today-status .status-tile strong{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0;line-height:1.15}
+.status-state{font-size:8px;letter-spacing:1.2px;font-weight:900;padding:4px 7px;border-radius:99px;border:1px solid var(--line)}
+.status-state.pending{color:#c6a77f;background:#30271e;border-color:#51402e}
+.status-state.completed{color:#9ed9bd;background:#1d352f;border-color:#31594b}
+.status-main{font-size:clamp(13px,3.5vw,17px);overflow-wrap:anywhere;color:var(--text)}
+.status-extra{font-size:8px;letter-spacing:.6px;color:var(--muted);font-weight:600}
+.macro-editor{display:grid;gap:9px;margin:14px 0 18px}
+.macro-editor-head,.macro-editor-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center}
+.macro-editor-head{font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:800}
+.macro-editor-row strong{font-size:10px;letter-spacing:.7px}
+.macro-editor-row input{width:100%;min-width:0;box-sizing:border-box;background:#0b121c;border:1px solid var(--line);border-radius:9px;padding:11px 7px;color:var(--text);font-size:13px}
+.macro-editor .full{grid-column:1/-1;margin:0;font-size:10px}
+@media(max-width:360px){.macro-editor-head,.macro-editor-row{grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1fr);gap:5px}.macro-editor-row input{padding:10px 4px;font-size:12px}}
