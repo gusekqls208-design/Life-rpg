@@ -63,19 +63,17 @@ function renderExerciseChart(){
  const chosen=$('reportExercise').value,rows=[];
  if(chosen){for(const w of data.workouts){for(const e of w.exercises||[]){if(e.name!==chosen||!e.sets?.length)continue;const valid=e.sets.map(s=>({weight:+s.weight||0,reps:+s.reps||0})).filter(s=>s.weight>0&&s.reps>0);if(valid.length)rows.push({date:w.date,weight:Math.max(...valid.map(s=>s.weight))})}}}
  const byDate={};rows.forEach(r=>byDate[r.date]=Math.max(byDate[r.date]||0,r.weight));const pts=Object.entries(byDate).sort((a,b)=>a[0].localeCompare(b[0])).slice(-20);
- if(!chosen||!pts.length){$('reportExerciseChart').innerHTML='<div class="empty-state">Log this exercise at least once to see its progress.</div>';$('reportExerciseStats').innerHTML='';return}
+ if(!chosen||!pts.length){$('reportExerciseChart').innerHTML='<div class="empty-state">운동 기록을 추가하면 중량 변화를 확인할 수 있어요.</div>';$('reportExerciseStats').innerHTML='';return}
  const W=620,H=220,p=36,vals=pts.map(x=>x[1]),lo=Math.min(...vals),hi=Math.max(...vals),span=Math.max(1,hi-lo),coords=pts.map((v,i)=>({x:p+i*(W-2*p)/Math.max(1,pts.length-1),y:160-(v[1]-lo)/span*112,...{date:v[0],weight:v[1]}}));
- $('reportExerciseChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Exercise weight progression"><line x1="${p}" y1="166" x2="${W-p}" y2="166" class="chart-axis"/><polyline class="weight-line" points="${coords.map(x=>x.x+','+x.y).join(' ')}"/>${coords.map(x=>`<circle class="weight-dot" cx="${x.x}" cy="${x.y}" r="5"><title>${x.date}: ${x.weight} kg</title></circle><text class="weight-date" x="${x.x}" y="194" text-anchor="middle">${x.date.slice(5).replace('-','/')}</text>`).join('')}</svg>`;
+ $('reportExerciseChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="운동 중량 변화"><line x1="${p}" y1="166" x2="${W-p}" y2="166" class="chart-axis"/><polyline class="weight-line" points="${coords.map(x=>x.x+','+x.y).join(' ')}"/>${coords.map(x=>`<circle class="weight-dot" cx="${x.x}" cy="${x.y}" r="5"><title>${x.date}: ${x.weight} kg</title></circle><text class="weight-date" x="${x.x}" y="194" text-anchor="middle">${x.date.slice(5).replace('-','/')}</text>`).join('')}</svg>`;
  const latest=pts.at(-1)[1],best=Math.max(...vals),first=pts[0][1],change=latest-first;
- $('reportExerciseStats').innerHTML=`<div><small>PERSONAL BEST</small><strong>${best} kg</strong></div><div><small>LATEST</small><strong>${latest} kg</strong></div><div><small>CHANGE</small><strong class="${change>=0?'growth-up':'growth-down'}">${change>0?'+':''}${change} kg</strong></div>`;
+ $('reportExerciseStats').innerHTML=`<div><small>최고 중량</small><strong>${best} kg</strong></div><div><small>최근 중량</small><strong>${latest} kg</strong></div><div><small>변화량</small><strong class="${change>=0?'growth-up':'growth-down'}">${change>0?'+':''}${change} kg</strong></div>`;
 }
 function reportMetrics(start,end){
   const r=rangeDates(start,end);
   const strength=new Set(r.workouts.filter(w=>w.type!=='CARDIO').map(w=>w.date)).size;
   const cardio=new Set(r.workouts.filter(w=>w.type==='CARDIO').map(w=>w.date)).size;
-  const sets=r.workouts.reduce((n,w)=>n+(w.exercises||[]).reduce((a,e)=>a+(e.sets?.length||0),0),0);
-  const minutes=r.workouts.reduce((n,w)=>n+(w.exercises||[]).reduce((a,e)=>a+(+e.minutes||0),0),0);
-  const dayTotals={};r.meals.forEach(m=>{let d=dayTotals[m.date]??={cal:0,p:0};d.cal+=+m.calories||0;d.p+=+m.protein||0});
+    const dayTotals={};r.meals.forEach(m=>{let d=dayTotals[m.date]??={cal:0,p:0};d.cal+=+m.calories||0;d.p+=+m.protein||0});
   const logged=Object.values(dayTotals),avgCal=logged.length?logged.reduce((a,x)=>a+x.cal,0)/logged.length:0,avgProtein=logged.length?logged.reduce((a,x)=>a+x.p,0)/logged.length:0;
   const weights=r.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)),weightChange=weights.length>1?weights.at(-1).weight-weights[0].weight:null;
   const active=new Set([...r.workouts.map(w=>w.date),...r.meals.map(m=>m.date)].filter(Boolean));
@@ -84,54 +82,51 @@ function reportMetrics(start,end){
   const missionKeys=Object.keys(data.weeklyMissions||{}).filter(k=>k<=end&&shiftDate(k,6)>=start);
   const missionTotal=missionKeys.reduce((n,k)=>n+(data.weeklyMissions[k]||[]).length,0);
   const missionDone=missionKeys.reduce((n,k)=>n+Object.keys(data.weeklyMissionClaims?.[k]||{}).length,0);
-  return {strength,cardio,sets,minutes,avgCal,avgProtein,weightChange,activeDays:active.size,longest,missionTotal,missionDone};
+  return {strength,cardio,avgCal,avgProtein,weightChange,activeDays:active.size,longest,missionTotal,missionDone};
 }
 function reportComparison(id,current,previous,unit='',higherBetter=true,decimals=0){
-  const el=$(id);if(current===null||previous===null||!Number.isFinite(current)||!Number.isFinite(previous)){el.className='report-compare report-neutral';el.textContent='NO PREVIOUS DATA';return}
-  const diff=current-previous;if(Math.abs(diff)<0.000001){el.className='report-compare report-neutral';el.textContent='— NO CHANGE';return}
-  const positive=higherBetter?diff>0:diff<0,amount=decimals?Math.abs(diff).toFixed(decimals):String(Math.abs(Math.round(diff)));
-  el.className='report-compare '+(positive?'report-positive':'report-negative');
-  el.textContent=(diff>0?'▲ +':'▼ ')+amount+unit+' VS PREV';
+ const el=$(id);if(current===null||previous===null||!Number.isFinite(current)||!Number.isFinite(previous)){el.className='report-compare report-neutral';el.textContent='이전 기록 없음';return}
+ const diff=current-previous;if(Math.abs(diff)<0.000001){el.className='report-compare report-neutral';el.textContent='변화 없음';return}
+ const positive=higherBetter?diff>0:diff<0,amount=decimals?Math.abs(diff).toFixed(decimals):String(Math.abs(Math.round(diff)));
+ el.className='report-compare '+(positive?'report-positive':'report-negative');
+ el.textContent=(diff>0?'▲ +':'▼ ')+amount+unit+' · 이전 기간 대비';
 }
 function reportGoalComparison(id,current,previous,target,unit=''){
-  const el=$(id);if(!current||!previous){el.className='report-compare report-neutral';el.textContent='NO PREVIOUS DATA';return}
-  const improvement=Math.abs(previous-target)-Math.abs(current-target);
-  if(Math.abs(improvement)<0.000001){el.className='report-compare report-neutral';el.textContent='— SAME DISTANCE TO GOAL';return}
-  el.className='report-compare '+(improvement>0?'report-positive':'report-negative');
-  el.textContent=(improvement>0?'▲ ':'▼ ')+Math.abs(Math.round(improvement))+unit+(improvement>0?' CLOSER TO GOAL':' FARTHER FROM GOAL');
+ const el=$(id);if(!current||!previous){el.className='report-compare report-neutral';el.textContent='비교할 이전 기록 없음';return}
+ const improvement=Math.abs(previous-target)-Math.abs(current-target);
+ if(Math.abs(improvement)<0.000001){el.className='report-compare report-neutral';el.textContent='목표와의 거리 동일';return}
+ el.className='report-compare '+(improvement>0?'report-positive':'report-negative');
+ el.textContent=(improvement>0?'▲ 목표에 가까워짐 ':'▼ 목표에서 멀어짐 ')+Math.abs(Math.round(improvement))+unit;
 }
 function renderReport(){
-  $('reportPrev').disabled=reportOffset<=-120;$('reportNext').disabled=reportOffset>=0;
-  const isExercise=reportMode==='exercise';$('reportPeriodNav').classList.toggle('hidden',isExercise);$('reportExercisePicker').classList.toggle('hidden',!isExercise);$('reportSummary').classList.toggle('hidden',isExercise);$('reportExercisePanel').classList.toggle('hidden',!isExercise);
-  document.querySelectorAll('[data-report-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.reportMode===reportMode));
-  if(isExercise){renderExerciseChart();return}
-  const {start,end}=reportRange();
-  let prevStart,prevEnd;
-  if(reportMode==='week'){prevStart=shiftDate(start,-7);prevEnd=shiftDate(end,-7)}
-  else{const d=new Date(start+'T12:00:00'),p=new Date(d.getFullYear(),d.getMonth()-1,1),last=new Date(d.getFullYear(),d.getMonth(),0);prevStart=isoDate(p);prevEnd=isoDate(last)}
-  const current=reportMetrics(start,end),previous=reportMetrics(prevStart,prevEnd);
-  const label=reportMode==='week'?new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  $('reportPeriodLabel').textContent=label;
-  $('reportWorkoutDays').textContent=current.strength+' DAYS';$('reportCardioDays').textContent=current.cardio+' DAYS';
-  $('reportSets').textContent=current.sets;$('reportMinutes').textContent=current.minutes+' MIN';
-  $('reportAvgCalories').textContent=Math.round(current.avgCal);$('reportAvgProtein').textContent=Math.round(current.avgProtein)+' g';
-  $('reportActiveDays').textContent=current.activeDays+' DAYS';$('reportBestStreak').textContent=current.longest+' DAYS';
-  $('reportMissionCount').textContent=current.missionTotal?current.missionDone+' / '+current.missionTotal:'—';
-  const weight=current.weightChange;
-  $('reportWeightChange').textContent=weight===null?'—':(weight>0?'+':'')+weight.toFixed(1)+' kg';
-  $('reportWeightChange').className=weight===null?'':Math.abs(weight)<0.000001?'report-neutral':weight<0?'report-positive':'report-negative';
-  reportComparison('reportWorkoutCompare',current.strength,previous.strength,' DAYS');
-  reportComparison('reportCardioCompare',current.cardio,previous.cardio,' DAYS');
-  reportComparison('reportSetsCompare',current.sets,previous.sets,' SETS');
-  reportComparison('reportMinutesCompare',current.minutes,previous.minutes,' MIN');
-  reportComparison('reportActiveCompare',current.activeDays,previous.activeDays,' DAYS');
-  reportComparison('reportMissionCompare',current.missionDone,previous.missionDone,' CLEARED');
-  if(weight!==null&&previous.weightChange!==null)reportComparison('reportWeightCompare',weight,previous.weightChange,' KG',false,1);
-  else{const el=$('reportWeightCompare');el.className='report-compare report-neutral';el.textContent='NOT ENOUGH WEIGHT LOGS'}
-  const g=goal();
-  reportGoalComparison('reportCaloriesCompare',current.avgCal,previous.avgCal,g.calories,' KCAL');
-  reportGoalComparison('reportProteinCompare',current.avgProtein,previous.avgProtein,g.protein,' G');
-  $('reportNarrative').textContent=current.strength+' strength days and '+current.cardio+' cardio days. You were active on '+current.activeDays+' days, with a best streak of '+current.longest+' consecutive days. Compared with the previous '+(reportMode==='week'?'week':'month')+', strength '+(current.strength===previous.strength?'was unchanged':(current.strength>previous.strength?'increased':'decreased')+' by '+Math.abs(current.strength-previous.strength)+' days')+' and cardio '+(current.cardio===previous.cardio?'was unchanged':(current.cardio>previous.cardio?'increased':'decreased')+' by '+Math.abs(current.cardio-previous.cardio)+' days')+'.';
+ $('reportPrev').disabled=reportOffset<=-120;$('reportNext').disabled=reportOffset>=0;
+ const isExercise=reportMode==='exercise';$('reportPeriodNav').classList.toggle('hidden',isExercise);$('reportExercisePicker').classList.toggle('hidden',!isExercise);$('reportSummary').classList.toggle('hidden',isExercise);$('reportExercisePanel').classList.toggle('hidden',!isExercise);
+ document.querySelectorAll('[data-report-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.reportMode===reportMode));
+ if(isExercise){renderExerciseChart();return}
+ const {start,end}=reportRange();let prevStart,prevEnd;
+ if(reportMode==='week'){prevStart=shiftDate(start,-7);prevEnd=shiftDate(end,-7)}
+ else{const d=new Date(start+'T12:00:00'),p=new Date(d.getFullYear(),d.getMonth()-1,1),last=new Date(d.getFullYear(),d.getMonth(),0);prevStart=isoDate(p);prevEnd=isoDate(last)}
+ const current=reportMetrics(start,end),previous=reportMetrics(prevStart,prevEnd);
+ const label=reportMode==='week'?new Date(start+'T12:00:00').toLocaleDateString('ko-KR',{month:'long',day:'numeric'})+' – '+new Date(end+'T12:00:00').toLocaleDateString('ko-KR',{month:'long',day:'numeric'}):new Date(start+'T12:00:00').toLocaleDateString('ko-KR',{year:'numeric',month:'long'});
+ $('reportPeriodLabel').textContent=label;
+ $('reportWorkoutDays').textContent=current.strength+'회';$('reportCardioDays').textContent=current.cardio+'회';
+ $('reportAvgCalories').textContent=Math.round(current.avgCal).toLocaleString('ko-KR')+' kcal';$('reportAvgProtein').textContent=Math.round(current.avgProtein)+' g';
+ $('reportActiveDays').textContent=current.activeDays+'일';$('reportBestStreak').textContent=current.longest+'일';
+ $('reportMissionCount').textContent=current.missionTotal?current.missionDone+' / '+current.missionTotal+'개':'기록 없음';
+ const weight=current.weightChange;
+ $('reportWeightChange').textContent=weight===null?'—':(weight>0?'+':'')+weight.toFixed(1)+' kg';
+ $('reportWeightChange').className=weight===null?'':Math.abs(weight)<0.000001?'report-neutral':weight<0?'report-positive':'report-negative';
+ reportComparison('reportWorkoutCompare',current.strength,previous.strength,'회');
+ reportComparison('reportCardioCompare',current.cardio,previous.cardio,'회');
+ reportComparison('reportActiveCompare',current.activeDays,previous.activeDays,'일');
+ reportComparison('reportMissionCompare',current.missionDone,previous.missionDone,'개');
+ if(weight!==null&&previous.weightChange!==null)reportComparison('reportWeightCompare',weight,previous.weightChange,' kg',false,1);
+ else{const el=$('reportWeightCompare');el.className='report-compare report-neutral';el.textContent='체중 기록이 더 필요해요'}
+ const g=goal();
+ reportGoalComparison('reportCaloriesCompare',current.avgCal,previous.avgCal,g.calories,' kcal');
+ reportGoalComparison('reportProteinCompare',current.avgProtein,previous.avgProtein,g.protein,' g');
+ const diff=(a,b,label)=>a===b?label+' 변화 없음':label+(a>b?' '+(a-b)+'회 증가':' '+(b-a)+'회 감소');
+ $('reportNarrative').textContent='이번 기간에는 웨이트 '+current.strength+'회, 유산소 '+current.cardio+'회 운동했어요. 총 '+current.activeDays+'일 활동했고, 최장 연속 활동은 '+current.longest+'일이에요. 이전 '+(reportMode==='week'?'주':'월')+'과 비교하면 '+diff(current.strength,previous.strength,'웨이트')+', '+diff(current.cardio,previous.cardio,'유산소')+'예요.';
 }
 function renderHome(){let lv=level();$('level').textContent=lv;$('xpText').textContent=`${currentXP()} / 100 XP`;$('xpBar').style.width=`${currentXP()}%`;let stage=lv>=90?10:lv>=80?9:lv>=70?8:lv>=60?7:lv>=50?5:lv>=40?6:lv>=30?4:lv>=20?3:lv>=10?2:1;$('stageLabel').textContent=`STAGE ${String(stage).padStart(2,'0')}`;$('avatar').src='assets/placeholder.svg';let ws=todayWorkouts(),ms=todayMeals(),types=[...new Set(ws.map(w=>w.type))],tot=ms.reduce((a,m)=>({cal:a.cal+m.calories,p:a.p+m.protein}),{cal:0,p:0});$('todayWorkoutTypes').innerHTML=types.length?`<span class="status-state completed">COMPLETED</span><span class="status-main">${types.join(' · ')}</span><small class="status-extra">${ws.length} SESSION${ws.length===1?'':'S'} LOGGED</small>`:`<span class="status-state pending">PENDING</span><span class="status-main">No session</span><small class="status-extra">Ready when you are</small>`;let g=goal();$('todayCalories').innerHTML='<span class="home-intake">'+Math.round(tot.cal)+'</span><small class="home-goal">/ '+Math.round(g.calories)+' kcal</small>';$('todayProtein').innerHTML='<span class="home-intake">'+Math.round(tot.p)+'</span><small class="home-goal">/ '+Math.round(g.protein)+' g</small>';$('quests').innerHTML=quests().map(q=>`<div class="quest ${q.ok?'done':''}"><div class="quest-mark">${q.ok?'🔥':'○'}</div><div class="quest-copy"><strong>${q.title}</strong><small>${q.desc}</small></div><span class="quest-reward">${q.ok?'CLEARED':'🔥 +'+q.xp+' XP'}</span></div>`).join('');renderWeight();renderActivityStreak();renderWeeklyMissions()}
 function renderWeight(){let logs=data.weightLogs.slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1),first=logs[0];$('latestWeight').textContent=last?last.weight.toFixed(1)+' kg':'-- kg';$('weightChange').textContent=logs.length>1?((last.weight-first.weight>0?'+':'')+(last.weight-first.weight).toFixed(1)+' kg overall'):'No data';let a=logs.slice(-12),chart=$('weightChart');if(!a.length)chart.innerHTML='<div class="empty">Add your first weight record.</div>';else if(a.length===1)chart.innerHTML=`<div class="single-point"><i></i><strong>${a[0].weight.toFixed(1)} kg</strong><small>${dateLabel(a[0].date)}</small></div>`;else{let vals=a.map(x=>x.weight),lo=Math.min(...vals),hi=Math.max(...vals),range=Math.max(1,hi-lo),W=600,H=190,p=22,pts=a.map((x,i)=>({x:p+i*(W-2*p)/(a.length-1),y:123-(x.weight-lo)/range*100,...x}));chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Weight trend"><line x1="${p}" y1="145" x2="${W-p}" y2="145" class="chart-axis"/><polyline points="${pts.map(x=>x.x+','+x.y).join(' ')}" class="weight-line"/>${pts.map(x=>`<circle cx="${x.x}" cy="${x.y}" r="5" class="weight-dot"><title>${x.date}: ${x.weight} kg</title></circle><text x="${x.x}" y="${Math.max(12,x.y-10)}" class="weight-value" text-anchor="middle">${x.weight.toFixed(1)}</text><text x="${x.x}" y="184" class="weight-date" text-anchor="middle">${x.date.slice(5).replace('-','/')}</text>`).join('')}</svg>`} $('weightHistory').textContent=logs.slice(-4).reverse().map(x=>dateLabel(x.date)+' · '+x.weight.toFixed(1)+' kg').join('   /   ');$('weightDetail').innerHTML=logs.slice().reverse().map(x=>`<div class="record"><div class="record-head"><strong>${x.weight.toFixed(1)} kg</strong><small>${dateLabel(x.date)}</small><button class="delete" data-delete-weight="${x.date}">DELETE</button></div></div>`).join('')||'<div class="empty-state">No weight records yet.</div>'}
