@@ -1,4 +1,4 @@
-const CACHE='life-rpg-winter-arc-v31';
+const CACHE='life-rpg-winter-arc-v32';
 const FILES=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./placeholder.svg','./icon.svg','./stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png','./stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png','./stage07_cutout.png','./stage08_cutout.png','./stage09_cutout.png','./stage10_cutout.png'];
 
 self.addEventListener('install',event=>{
@@ -19,6 +19,20 @@ self.addEventListener('activate',event=>{
 
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
+
+  // Always check the network first for page navigations so Safari's
+  // clean GitHub Pages URL does not keep serving an old cached index.
+  if(event.request.mode==='navigate'){
+    event.respondWith(fetch(event.request).then(response=>{
+      if(response&&response.ok){
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(new URL('./index.html',self.registration.scope).toString(),copy));
+      }
+      return response;
+    }).catch(()=>caches.match(new URL('./index.html',self.registration.scope).toString())));
+    return;
+  }
+
   event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{
     if(response&&response.ok){
       const copy=response.clone();
