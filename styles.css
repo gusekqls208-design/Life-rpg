@@ -502,3 +502,9 @@ button,a,select{touch-action:manipulation}
 .diet-history-food-row strong{font-size:11px;color:#e0eaf2;overflow-wrap:anywhere}
 .diet-history-food-row span{font-size:10px;color:#9bd7ed;white-space:nowrap;font-weight:800}
 .diet-history-group-macros{display:flex;gap:14px;padding:9px 2px 1px;border-top:1px solid #2b3d50;color:#9eafc0;font-size:9px}
+
+/* Selected-date history uses the exact typography and colors of the meal logger */
+.diet-history-meal-group{padding:0;background:#121b27;border-color:var(--line)}
+.diet-history-meal-heading{padding:14px}
+.diet-history-meal-heading strong{font-size:12px;letter-spacing:normal;color:var(--text)}
+.diet-history-meal-foods{display:block;gap:0}
