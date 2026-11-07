@@ -508,3 +508,5 @@ button,a,select{touch-action:manipulation}
 .diet-history-meal-heading{padding:14px}
 .diet-history-meal-heading strong{font-size:12px;letter-spacing:normal;color:var(--text)}
 .diet-history-meal-foods{display:block;gap:0}
+
+.macro-remaining{display:block;margin-top:3px;font-size:9px!important;color:var(--muted)!important;letter-spacing:0!important;line-height:1.35;}
