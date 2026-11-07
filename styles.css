@@ -94,3 +94,20 @@
 .tabs{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(calc(100% - 24px),644px);margin:0;padding:5px 5px calc(env(safe-area-inset-bottom) + 5px);border-radius:16px 16px 0 0;background:#0d141ef2;border:1px solid #29394b;border-bottom:0;box-shadow:0 -8px 28px #0005;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .tab{padding:13px 4px}
 main{padding-bottom:14px}
+
+/* v8: recommendation card stays inside narrow screens */
+.form-panel,.form-panel form,#recommendation{min-width:0;max-width:100%;box-sizing:border-box}
+#recommendation{display:block;width:100%;overflow:hidden}
+#recommendation *{min-width:0;box-sizing:border-box}
+.recommendation-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}
+.recommendation-set{gap:8px;min-width:0}
+.recommendation-set>strong{min-width:0;justify-content:flex-end;gap:clamp(4px,2vw,8px);font-size:clamp(10px,2.8vw,12px);white-space:normal;text-align:right}
+.recommendation-set b,.recommendation-set em{overflow-wrap:anywhere}
+.recommendation-previous{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:380px){.recommendation{padding:11px}.recommendation-head{align-items:flex-start;flex-wrap:wrap}.recommendation-status{font-size:8px;padding:6px 7px}.recommendation-metrics{gap:5px}.recommendation-metrics>div{padding:8px 6px}.recommendation-set{padding:8px}.recommendation-set>span{font-size:9px}}
+/* v8: flame rewards, activity streak and strength progression */
+.quest-mark{font-size:15px}.quest.done .quest-mark{color:#ffad70;background:#38271f;border-color:#77513a;text-shadow:0 0 9px #ff9c5577}.quest-reward{font-weight:800}.quest.done .quest-reward{color:#ffad70;text-shadow:0 0 8px #ffad7033}
+.xp-gain-toast{position:fixed;z-index:50;left:50%;bottom:calc(env(safe-area-inset-bottom) + 82px);transform:translate(-50%,14px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:999px;background:#182535;border:1px solid #76533d;box-shadow:0 8px 28px #0008,0 0 18px #ffad7022;transition:opacity .2s,transform .2s}
+.xp-gain-toast.show{opacity:1;transform:translate(-50%,0)}.xp-gain-toast span{font-size:16px}.xp-gain-toast strong{color:#ffbd86;font-size:13px}.xp-gain-toast small{font-size:8px;letter-spacing:1px;color:#aebdca}
+.streak-panel,.growth-panel{padding:15px}.streak-top{display:flex;align-items:end;justify-content:space-between;gap:12px}.streak-top strong{display:block;font-size:28px;color:#ffad70;line-height:1}.streak-top small,.streak-foot{font-size:9px;color:var(--muted);letter-spacing:.7px}.streak-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:5px;margin:15px 0 10px}.streak-cell{aspect-ratio:1;border-radius:4px;background:#202c3a;border:1px solid #2b3b4d}.streak-cell.active{background:#4e987f;border-color:#65c5a2;box-shadow:0 0 7px #65c5a222}.streak-cell.is-today{outline:1px solid #8dc8e7;outline-offset:2px}
+.growth-list{display:grid;gap:9px}.growth-card{padding:12px;background:#101a26;border:1px solid var(--line);border-radius:12px;min-width:0}.growth-title{display:flex;align-items:center;justify-content:space-between;gap:8px}.growth-title strong{font-size:12px;overflow-wrap:anywhere}.growth-title span{font-size:8px;letter-spacing:.8px;color:var(--muted);white-space:nowrap}.growth-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}.growth-stats>div{min-width:0;display:grid;gap:5px}.growth-stats small{font-size:8px;letter-spacing:.5px;color:var(--muted)}.growth-stats b{font-size:12px;overflow-wrap:anywhere}.growth-up{color:#78d5aa}.growth-down{color:#e6a16f}.growth-date{display:block;margin-top:10px;font-size:8px;color:var(--muted)}
