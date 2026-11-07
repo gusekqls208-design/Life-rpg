@@ -494,3 +494,11 @@ button,a,select{touch-action:manipulation}
 .diet-history-meal-heading span{font-size:9px;color:#91a4b8}
 .diet-history-meal-foods{display:grid;gap:7px}
 .diet-history-meal-foods .diet-history-item{padding:10px;background:#101a26;border-color:#2b3d50}
+
+
+/* Selected-date diet: one unified card per meal */
+.diet-history-food-list{display:grid;gap:0}
+.diet-history-food-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-top:1px solid #2b3d50}
+.diet-history-food-row strong{font-size:11px;color:#e0eaf2;overflow-wrap:anywhere}
+.diet-history-food-row span{font-size:10px;color:#9bd7ed;white-space:nowrap;font-weight:800}
+.diet-history-group-macros{display:flex;gap:14px;padding:9px 2px 1px;border-top:1px solid #2b3d50;color:#9eafc0;font-size:9px}
