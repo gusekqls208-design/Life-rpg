@@ -162,20 +162,20 @@ main{padding-bottom:14px}
 
 /* v11: integrated Player Status streak and compact HOME nutrition targets */
 .hero-copy{min-width:0}
-.hero-streak-inline{display:grid;grid-template-columns:auto minmax(90px,1fr) auto;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid #304257}
+.hero-streak-inline{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #304257}
 .hero-streak-main,.hero-streak-best{display:grid;gap:4px}
 .hero-streak-main>strong{font-size:23px;line-height:1;color:#ffad70}
 .hero-streak-main>span,.hero-streak-best>small{font-size:8px;letter-spacing:.8px;color:var(--muted);font-weight:900;white-space:nowrap}
-.hero-streak-best{text-align:right}
+.hero-streak-best{grid-column:2;grid-row:1;text-align:right}
 .hero-streak-best>strong{font-size:10px;color:var(--text);white-space:nowrap}
-.hero-streak-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.hero-streak-week{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
 .hero-streak-week .streak-day{gap:4px}
 .hero-streak-week .streak-day small{font-size:7px}
 .hero-streak-week .streak-day span{max-width:22px;font-size:9px;border-radius:6px}
-.status-tile strong.home-calories,.status-tile strong.home-protein{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:4px}
+.today-status .status-tile strong.home-calories,.today-status .status-tile strong.home-protein{display:flex;flex-direction:row;align-items:baseline;flex-wrap:wrap;gap:4px}
 .status-tile .home-intake{font-size:inherit;line-height:1.15}
 .status-tile .home-goal{font-size:9px;letter-spacing:0;font-weight:650;color:var(--muted);white-space:nowrap}
-@media(max-width:390px){.hero-streak-inline{grid-template-columns:auto minmax(76px,1fr) auto;gap:7px}.hero-streak-main>strong{font-size:20px}.hero-streak-week{gap:2px}.hero-streak-week .streak-day span{font-size:8px}.hero-streak-best>strong{font-size:9px}}
+@media(max-width:390px){.hero-streak-inline{grid-template-columns:minmax(0,1fr) auto;gap:7px}.hero-streak-main>strong{font-size:20px}.hero-streak-week{gap:2px}.hero-streak-week .streak-day span{font-size:8px}.hero-streak-best>strong{font-size:9px}}
 /* v11: selected-date records directly follow the workout calendar */
 #workoutHistory{margin-top:-3px}
 #workoutHistory .empty-state{padding:16px 12px;background:#111c29;border:1px dashed var(--line);border-radius:12px}
