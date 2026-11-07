@@ -49,3 +49,13 @@
 .food-suggestions{margin-top:-7px}
 .recommendation{border-color:#365d78;box-shadow:0 0 12px #65bfff12}
 @media(max-width:390px){.meal-summary{gap:7px;font-size:9px}.meal-summary>strong{font-size:10px}}
+
+.field-label.macro-carbs{color:var(--carbs);text-shadow:0 0 8px #65e6a533}
+.field-label.macro-protein{color:var(--protein);text-shadow:0 0 8px #65bfff33}
+.field-label.macro-fat{color:var(--fat);text-shadow:0 0 8px #ffad7033}
+.macro-grid .macro-carbs>span,.macro-grid .macro-carbs>strong{color:var(--carbs);text-shadow:0 0 8px #65e6a533}
+.macro-grid .macro-protein>span,.macro-grid .macro-protein>strong{color:var(--protein);text-shadow:0 0 8px #65bfff33}
+.macro-grid .macro-fat>span,.macro-grid .macro-fat>strong{color:var(--fat);text-shadow:0 0 8px #ffad7033}
+.meal-summary .macro-carbs{color:var(--carbs);text-shadow:0 0 8px #65e6a533}
+.meal-summary .macro-protein{color:var(--protein);text-shadow:0 0 8px #65bfff33}
+.meal-summary .macro-fat{color:var(--fat);text-shadow:0 0 8px #ffad7033}
