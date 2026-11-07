@@ -111,7 +111,6 @@ makeAchievement('quest30','SPECIAL','QUEST ADDICT','퀘스트 러너','일일 �
 makeAchievement('quest100','SPECIAL','QUEST MASTER','퀘스트 마스터','일일 퀘스트 완료일 100일 달성','gold','⚔',s=>s.questDays>=100),
 makeAchievement('perfect01','SPECIAL','PERFECT DAY','완벽한 하루','하루의 일일 퀘스트 4개 모두 완료','silver','🌠',s=>s.perfectQuestDays>=1),
 makeAchievement('perfect07','SPECIAL','PERFECT WEEK','완벽한 한 주','일일 퀘스트 4개를 모두 완료한 날 7일 달성','platinum','✨',s=>s.perfectQuestDays>=7),
-makeAchievement('perfect30','SPECIAL','PERFECT MONTH','완벽한 한 달','일일 퀘스트 4개를 모두 완료한 날 30일 달성','legendary','🌌',s=>s.perfectQuestDays>=30),
 makeAchievement('weekly10','SPECIAL','WEEKLY CHAMPION','주간 미션 챔피언','주간 미션 10개 완료','gold','🏅',s=>s.weeklyMissions>=10)
 ];
 function achievementStats(){
@@ -416,4 +415,9 @@ $('goalForm').onsubmit=async e=>{e.preventDefault();syncMacros();let c=+$('goalC
 $('exportData').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='life-rpg-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)};
 $('importData').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x||!Array.isArray(x.workouts)||!Array.isArray(x.meals))throw Error();data={...data,...x};data.workouts=normalizeWorkouts(data.workouts);await writeSave();renderHome();renderHistory();renderDiet();alert('Backup restored.')}catch{alert('Invalid backup file.')}e.target.value=''};
 async function init(){db=await openDB();let saved=await readSave();if(saved){data={...data,...saved};data.workouts=normalizeWorkouts(data.workouts)}data.habits??=[];data.habitLogs??={};data.habitVersions??=[];data.rankHistory??=[];data.achievementUnlocks??=[];data.weightGoal??=null;ensureHabitVersions();data.highestRank??=rankForLevel(level()).name;$('todayLabel').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();['weightDate','workoutDate','workoutHistoryDate'].forEach(id=>$(id).value=today());$('sets').innerHTML='';addSet();renderDraft();await rewardQuests(false);getWeeklyMissionSet();await claimWeeklyMissionRewards();renderHome();renderHistory();renderDiet();renderHabits();renderReport();$('exercise').dataset.selected='false';suppressLevelUp=false;if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{})}
+
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+
 init().catch(e=>{console.error(e);alert('Unable to initialize local storage. Please use Safari or Chrome with site storage enabled.')});
