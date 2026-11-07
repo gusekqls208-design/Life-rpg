@@ -23,7 +23,6 @@ function getWeeklyMissionSet(){
  const prevEnd=shiftDate(key,-1),prevStart=shiftDate(key,-7),prev=rangeDates(prevStart,prevEnd),g=goal();
  const strengthDays=new Set(prev.workouts.filter(w=>w.type!=='CARDIO').map(w=>w.date)).size;
  const cardioDays=new Set(prev.workouts.filter(w=>w.type==='CARDIO').map(w=>w.date)).size;
- const proteinDays=new Set(prev.meals.filter(m=>false).map(m=>m.date));
  const proteinByDay={};prev.meals.forEach(m=>proteinByDay[m.date]=(proteinByDay[m.date]||0)+(+m.protein||0));
  const proteinGoalDays=Object.values(proteinByDay).filter(v=>v>=g.protein).length;
  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
@@ -71,6 +70,7 @@ function renderExerciseChart(){
  $('reportExerciseStats').innerHTML=`<div><small>PERSONAL BEST</small><strong>${best} kg</strong></div><div><small>LATEST</small><strong>${latest} kg</strong></div><div><small>CHANGE</small><strong class="${change>=0?'growth-up':'growth-down'}">${change>0?'+':''}${change} kg</strong></div>`;
 }
 function renderReport(){
+ $('reportPrev').disabled=reportOffset<=-120;$('reportNext').disabled=reportOffset>=0;
  const isExercise=reportMode==='exercise';$('reportPeriodNav').classList.toggle('hidden',isExercise);$('reportExercisePicker').classList.toggle('hidden',!isExercise);$('reportSummary').classList.toggle('hidden',isExercise);$('reportExercisePanel').classList.toggle('hidden',!isExercise);
  document.querySelectorAll('[data-report-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.reportMode===reportMode));
  if(isExercise){renderExerciseChart();return}
@@ -81,7 +81,7 @@ function renderReport(){
  const ws=r.weights.sort((a,b)=>a.date.localeCompare(b.date)),weightChange=ws.length>1?ws.at(-1).weight-ws[0].weight:null;
  const label=reportMode==='week'?new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})+' – '+new Date(end+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):new Date(start+'T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});
  $('reportPeriodLabel').textContent=label;$('reportWorkoutDays').textContent=strength;$('reportCardioDays').textContent=cardio;$('reportSets').textContent=sets;$('reportMinutes').textContent=minutes;$('reportAvgCalories').textContent=Math.round(avgCal);$('reportAvgProtein').textContent=Math.round(avgProtein)+' g';$('reportWeightChange').textContent=weightChange===null?'—':(weightChange>0?'+':'')+weightChange.toFixed(1)+' kg';
- const missionKey=weekStart(start),missions=data.weeklyMissions?.[missionKey]||[],claims=data.weeklyMissionClaims?.[missionKey]||{};$('reportMissionCount').textContent=missions.length?Object.keys(claims).length+' / '+missions.length:'—';
+ const missionKeys=Object.keys(data.weeklyMissions||{}).filter(k=>k>=start&&k<=end),missionTotal=missionKeys.reduce((n,k)=>n+(data.weeklyMissions[k]||[]).length,0),missionDone=missionKeys.reduce((n,k)=>n+Object.keys(data.weeklyMissionClaims?.[k]||{}).length,0);$('reportMissionCount').textContent=missionTotal?missionDone+' / '+missionTotal:'—';
  $('reportNarrative').textContent= r.workouts.length||r.meals.length? `You logged ${r.workouts.length} workout day records and ${r.meals.length} meals during this period.`:'No activity logged in this period yet.';
 }
 function renderHome(){let lv=level();$('level').textContent=lv;$('xpText').textContent=`${currentXP()} / 100 XP`;$('xpBar').style.width=`${currentXP()}%`;let stage=lv>=90?10:lv>=80?9:lv>=70?8:lv>=60?7:lv>=50?5:lv>=40?6:lv>=30?4:lv>=20?3:lv>=10?2:1;$('stageLabel').textContent=`STAGE ${String(stage).padStart(2,'0')}`;$('avatar').src='assets/placeholder.svg';let ws=todayWorkouts(),ms=todayMeals(),types=[...new Set(ws.map(w=>w.type))],tot=ms.reduce((a,m)=>({cal:a.cal+m.calories,p:a.p+m.protein}),{cal:0,p:0});$('todayWorkoutTypes').innerHTML=types.length?`<span class="status-state completed">COMPLETED</span><span class="status-main">${types.join(' · ')}</span><small class="status-extra">${ws.length} SESSION${ws.length===1?'':'S'} LOGGED</small>`:`<span class="status-state pending">PENDING</span><span class="status-main">No session</span><small class="status-extra">Ready when you are</small>`;let g=goal();$('todayCalories').textContent=`${Math.round(tot.cal)} / ${Math.round(g.calories)} kcal`;$('todayProtein').textContent=`${Math.round(tot.p)} / ${Math.round(g.protein)} g`;$('quests').innerHTML=quests().map(q=>`<div class="quest ${q.ok?'done':''}"><div class="quest-mark">${q.ok?'🔥':'○'}</div><div class="quest-copy"><strong>${q.title}</strong><small>${q.desc}</small></div><span class="quest-reward">${q.ok?'CLEARED':'🔥 +'+q.xp+' XP'}</span></div>`).join('');renderWeight();renderActivityStreak();renderWeeklyMissions()}
