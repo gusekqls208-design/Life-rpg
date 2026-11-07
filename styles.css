@@ -206,3 +206,62 @@ main{padding-bottom:14px}
 .report-note .eyebrow{color:#9ebbd5;letter-spacing:.3px;font-size:10px}
 .report-note p{font-size:12px;color:#d0dbe6;line-height:1.75}
 .report-switch button{font-size:12px}
+
+/* v13 · Premium rank progression, Habit Maker and running metrics */
+.tabs{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tab{font-size:8px;letter-spacing:.55px}
+.home-rank{display:flex;align-items:center;gap:9px;margin-top:12px;padding:8px 10px;border:1px solid #34475c;border-radius:11px;background:linear-gradient(110deg,#182638,#0c141f)}
+.rank-mini-emblem{width:39px;height:43px;flex:none;filter:drop-shadow(0 3px 7px #0009)}
+.rank-emblem-svg{width:100%;height:100%;display:block}
+.rank-mini-copy{display:grid;gap:2px;min-width:0;flex:1}
+.rank-mini-copy small{font-size:7px;letter-spacing:1.4px;color:#8fa4b9;font-weight:900}
+.rank-mini-copy strong{font-size:12px;letter-spacing:1.2px;color:#e5d3a7}
+.rank-mini-copy span{font-size:8px;color:#9cabbc}
+.rank-mini-progress{font-size:7px;letter-spacing:.6px;color:#9eb5c8;text-align:right}
+.levelup-modal{width:min(92vw,390px);overflow:hidden;border:1px solid #776345;background:radial-gradient(ellipse at 50% 10%,#35465b 0%,#131e2c 48%,#080e17 100%);box-shadow:0 20px 80px #000d,0 0 50px #d5a85b22}
+.levelup-modal::backdrop{background:#03070ddd;backdrop-filter:blur(8px)}
+.levelup-content{position:relative;z-index:1;display:grid;justify-items:center;gap:13px;padding:24px 18px;text-align:center}
+.levelup-content .eyebrow{color:#c9b17e;letter-spacing:2.5px;font-size:8px}
+.levelup-kicker{font-size:13px;font-weight:950;letter-spacing:5px;color:#f0d49a;text-shadow:0 0 22px #d7a34c88}
+.levelup-emblem{width:112px;height:124px;filter:drop-shadow(0 8px 22px #d2ad6b55);animation:rankReveal .8s cubic-bezier(.2,.8,.2,1) both}
+.levelup-level{display:flex;align-items:center;gap:14px;font-size:23px;color:#8d9caf;font-weight:800}
+.levelup-level i{font-style:normal;color:#d8b879;font-size:18px}
+.levelup-level strong{font-size:42px;line-height:1;color:#f0e4c9;text-shadow:0 0 22px #d6b46c66}
+.levelup-rank{font-size:14px;font-weight:950;letter-spacing:3px;color:#e5c887}
+.levelup-content p{margin:0;color:#bdc9d6;font-size:12px;line-height:1.7}
+.levelup-rank-notice{padding:7px 12px;border:1px solid #b58d51;border-radius:99px;color:#f0d29a;font-size:8px;letter-spacing:2px;font-weight:900}
+.levelup-glow{position:absolute;left:50%;top:23%;width:250px;height:250px;transform:translate(-50%,-50%);background:radial-gradient(circle,#d8b56b30 0%,#9eb4d411 38%,transparent 70%);pointer-events:none}
+@keyframes rankReveal{0%{opacity:0;transform:translateY(18px) scale(.72) rotate(-7deg);filter:brightness(2)}65%{opacity:1;transform:translateY(-3px) scale(1.06) rotate(1deg)}100%{opacity:1;transform:translateY(0) scale(1)}}
+.habit-intro{display:flex;align-items:center;gap:13px;padding:15px;background:linear-gradient(125deg,#1a2b3d,#101925);border-color:#354b61}
+.habit-intro-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#293e53;color:#e5c17b;font-size:24px}
+.habit-intro strong{font-size:12px;color:#e4edf5}
+.habit-intro p{margin:5px 0 0;color:#9eafc1;font-size:10px;line-height:1.5}
+.habit-templates{display:flex;gap:7px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.habit-templates button{flex:none;padding:9px 11px;border:1px solid #34485d;border-radius:999px;background:#142131;color:#c8d5e2;font-size:10px}
+.habit-list{display:grid;gap:9px}
+.habit-card{padding:13px;border:1px solid #304258;border-radius:13px;background:linear-gradient(145deg,#172536,#101925)}
+.habit-card.done{border-color:#765b43;background:linear-gradient(145deg,#29271f,#111a24)}
+.habit-card-main{display:flex;align-items:center;gap:10px}
+.habit-icon{display:grid;place-items:center;width:39px;height:39px;flex:none;border-radius:11px;background:#26394d;font-size:20px}
+.habit-copy{display:grid;gap:4px;min-width:0;flex:1}
+.habit-copy strong{font-size:12px;color:#e0e8f0}
+.habit-copy small{font-size:9px;color:#91a4b8}
+.habit-edit{border:0;background:transparent;color:#9bafc2;font-size:21px;padding:4px 7px}
+.habit-card-action{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px}
+.habit-value{width:112px;min-width:0;padding:9px;border:1px solid #3b5066;border-radius:8px;background:#0b131e;color:#eef4fa;font-size:12px}
+.habit-complete{padding:9px 15px;font-size:10px}
+.habit-done-label{color:#e8bd7a;font-size:10px;font-weight:900;letter-spacing:.7px}
+.habit-summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.habit-summary>div{display:grid;gap:5px}
+.habit-summary small{font-size:9px;color:#91a4b8}
+.habit-summary strong{font-size:20px;color:#e3c17d}
+.habit-history{display:grid;gap:7px}
+.habit-history-row{display:flex;justify-content:space-between;padding:11px 13px;background:#111c29;border:1px solid #2c3d50;border-radius:9px;color:#b8c7d5;font-size:10px}
+.habit-editor .modal-head{margin-bottom:16px}
+.habit-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.habit-form-grid input,.habit-form-grid select,.habit-editor input,.habit-editor select{width:100%}
+.habit-weekdays{display:flex;flex-wrap:wrap;gap:7px;margin:3px 0 13px}
+.habit-weekdays label{display:flex;align-items:center;gap:4px;padding:7px 9px;background:#172638;border:1px solid #34485d;border-radius:8px;font-size:10px}
+.habit-weekdays input{width:auto}
+.habit-form-hint{font-size:9px;color:#9bafc2;line-height:1.6;margin:12px 0}
+@media(max-width:390px){.tab{font-size:7px;letter-spacing:0}.home-rank{gap:6px;padding:7px}.rank-mini-progress{font-size:6px}.habit-form-grid{gap:6px}}
