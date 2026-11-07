@@ -332,3 +332,7 @@ main{padding-bottom:14px}
 .rank-promotion .levelup-rank-notice{background:linear-gradient(100deg,#71542a66,#b78d4d55);box-shadow:0 0 22px #e5c27b44}
 @keyframes promotionPulse{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(.94)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
 @keyframes promotionAura{0%,100%{filter:drop-shadow(0 0 10px #f1d18b66) drop-shadow(0 0 22px #83d9f244)}50%{filter:drop-shadow(0 0 18px #fff0bfcc) drop-shadow(0 0 38px #83d9f288)}}
+
+.rank-tier-2{filter:drop-shadow(0 0 3px #c4d5e044)}
+.rank-tier-3{filter:drop-shadow(0 0 4px #e5bd7055)}
+.rank-tier-4{filter:drop-shadow(0 0 5px #b9d2df66)}
