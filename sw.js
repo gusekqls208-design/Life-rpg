@@ -1,4 +1,4 @@
-const CACHE='life-rpg-winter-arc-v25';
+const CACHE='life-rpg-winter-arc-v26';
 const FILES=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./placeholder.svg','./icon.svg','./stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png','./stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png','./stage07_cutout.png','./stage08_cutout.png','./stage09_cutout.png','./stage10_cutout.png'];
 
 self.addEventListener('install',event=>{
