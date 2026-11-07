@@ -1,6 +1,6 @@
 const DB_NAME='LIFE_RPG_WINTER_ARC_PWA',DB_VERSION=1,STORE='save',$=id=>document.getElementById(id),today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`},uid=()=>crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random()}`;
-let db,data={xp:0,coins:0,habits:[],habitLogs:{},rankHistory:[],highestRank:'IRON',workouts:[],meals:[],nutritionGoal:{calories:2000,mode:'grams',protein:150,carbs:200,fat:67,proteinRatio:30,carbsRatio:40,fatRatio:30},weightLogs:[],questClaims:{},weeklyMissions:{},weeklyMissionClaims:{}},draft=[],calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
-let pendingLevelUp=null,suppressLevelUp=true;const RANKS=[{name:'IRON',min:1,max:10,metal:'#8996a5',deep:'#303b49'},{name:'BRONZE',min:11,max:20,metal:'#c18455',deep:'#573a2c'},{name:'SILVER',min:21,max:30,metal:'#d1dce7',deep:'#526276'},{name:'GOLD',min:31,max:40,metal:'#e6bd68',deep:'#705125'},{name:'PLATINUM',min:41,max:50,metal:'#b9d2df',deep:'#466275'},{name:'EMERALD',min:51,max:60,metal:'#55c39b',deep:'#174d42'},{name:'DIAMOND',min:61,max:70,metal:'#83d9f2',deep:'#245779'},{name:'MASTER',min:71,max:80,metal:'#b39af0',deep:'#45366d'},{name:'GRAND MASTER',min:81,max:90,metal:'#e5c27b',deep:'#63436f'},{name:'CHALLENGER',min:91,max:9999,metal:'#f07b72',deep:'#602d38'}];const rankForLevel=n=>RANKS.find(r=>n>=r.min&&n<=r.max)||RANKS[0];function rankEmblem(r){
+let db,data={xp:0,coins:0,habits:[],habitLogs:{},rankHistory:[],highestRank:'IRON',workouts:[],meals:[],nutritionGoal:{calories:2000,mode:'grams',protein:150,carbs:200,fat:67,proteinRatio:30,carbsRatio:40,fatRatio:30},weightLogs:[],questClaims:{},weeklyMissions:{},weeklyMissionClaims:{},weightGoal:null,achievementUnlocks:[]},draft=[],calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let pendingLevelUp=null,suppressLevelUp=true,pendingAchievementUnlocks=[],achievementFilter='all';const RANKS=[{name:'IRON',min:1,max:10,metal:'#8996a5',deep:'#303b49'},{name:'BRONZE',min:11,max:20,metal:'#c18455',deep:'#573a2c'},{name:'SILVER',min:21,max:30,metal:'#d1dce7',deep:'#526276'},{name:'GOLD',min:31,max:40,metal:'#e6bd68',deep:'#705125'},{name:'PLATINUM',min:41,max:50,metal:'#b9d2df',deep:'#466275'},{name:'EMERALD',min:51,max:60,metal:'#55c39b',deep:'#174d42'},{name:'DIAMOND',min:61,max:70,metal:'#83d9f2',deep:'#245779'},{name:'MASTER',min:71,max:80,metal:'#b39af0',deep:'#45366d'},{name:'GRAND MASTER',min:81,max:90,metal:'#e5c27b',deep:'#63436f'},{name:'CHALLENGER',min:91,max:9999,metal:'#f07b72',deep:'#602d38'}];const rankForLevel=n=>RANKS.find(r=>n>=r.min&&n<=r.max)||RANKS[0];function rankEmblem(r){
  const key=r.name.toLowerCase().replace(/[^a-z0-9]+/g,"-"),rankIndex=RANKS.indexOf(r);
  const halo=rankIndex>=7?'<circle cx="50" cy="56" r="47" fill="none" stroke="'+r.metal+'" stroke-opacity=".32" stroke-width="1.2" stroke-dasharray="2 4"/><circle cx="50" cy="56" r="43" fill="none" stroke="'+r.metal+'" stroke-opacity=".16" stroke-width="2"/>':'';
  const engraving=rankIndex>=2?'<g fill="none" stroke="'+r.metal+'" stroke-opacity=".72" stroke-width="1.2"><path d="M17 28 Q11 34 17 42 M83 28 Q89 34 83 42 M20 67 Q14 72 20 78 M80 67 Q86 72 80 78"/><path d="M13 54 L19 59 M87 54 L81 59"/></g>':'';
@@ -59,10 +59,151 @@ function renderHabitReport(){
  $('habitReportDetails').innerHTML=s.items.map(x=>'<article class="habit-report-row"><div><strong>'+escapeHabit(x.name)+'</strong><small>'+x.done+' / '+x.total+'회 완료</small></div><b>'+(x.total?Math.round(x.done/x.total*100):0)+'%</b><div class="mission-track"><i style="width:'+(x.total?Math.round(x.done/x.total*100):0)+'%"></i></div></article>').join('')||'<div class="empty-state">이 기간에 기록된 습관이 없어요.</div>';
  $('habitReportDialog').showModal();
 }
-function showLevelUp(info){if(!info||suppressLevelUp||!$('levelUpDialog'))return;let old=rankForLevel(info.from),next=rankForLevel(info.to),promoted=old.name!==next.name;$('levelUpFrom').textContent=info.from;$('levelUpTo').textContent=info.to;$('levelUpRank').textContent=next.name;$('levelUpEmblem').innerHTML=rankEmblem(next);$('levelUpRankNotice').classList.toggle('hidden',!promoted);$('levelUpDialog').classList.toggle('rank-promotion',promoted);$('levelUpMessage').textContent=promoted?'새로운 등급을 획득했습니다. 지금까지의 노력이 증명됐어요.':'한 단계 더 성장했습니다. 지금의 흐름을 이어가세요.';$('levelUpDialog').showModal()}function grantXP(amount){let from=level();data.xp=Math.max(0,(+data.xp||0)+amount);let to=level();if(to>from){let rank=rankForLevel(to),old=rankForLevel(from);data.rankHistory??=[];if(old.name!==rank.name&&!data.rankHistory.some(x=>x.rank===rank.name))data.rankHistory.push({rank:rank.name,level:to,date:today()});let best=RANKS.find(x=>x.name===(data.highestRank||'IRON'))||RANKS[0];if(RANKS.indexOf(rank)>RANKS.indexOf(best))data.highestRank=rank.name;pendingLevelUp={from,to};}return to>from}const COLORS={PUSH:'#78b9e8',PULL:'#82c5a5',LEGS:'#d6a16e',CARDIO:'#ad98ca'},dateLabel=d=>new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),level=()=>Math.max(1,Math.floor(data.xp/100)+1),currentXP=()=>data.xp%100;
+
+function makeAchievement(id,category,title,honor,desc,tier,symbol,check){return {id,category,title,honor,desc,tier,symbol,check}}
+const ACHIEVEMENTS=[
+makeAchievement('lv05','LEVEL','FIRST STEPS','새싹 모험가','레벨 5 달성','bronze','✦',s=>s.level>=5),
+makeAchievement('lv10','LEVEL','AWAKENED','각성자','레벨 10 달성','bronze','☀',s=>s.level>=10),
+makeAchievement('lv20','LEVEL','RISING HERO','성장하는 영웅','레벨 20 달성','silver','⚔',s=>s.level>=20),
+makeAchievement('lv30','LEVEL','VETERAN','베테랑','레벨 30 달성','silver','🛡',s=>s.level>=30),
+makeAchievement('lv40','LEVEL','ELITE','엘리트','레벨 40 달성','gold','✧',s=>s.level>=40),
+makeAchievement('lv50','LEVEL','HALF CENTURY','정상의 길','레벨 50 달성','gold','♛',s=>s.level>=50),
+makeAchievement('lv75','LEVEL','ASCENDANT','초월자','레벨 75 달성','platinum','❖',s=>s.level>=75),
+makeAchievement('lv100','LEVEL','LEGEND','전설','레벨 100 달성','legendary','👑',s=>s.level>=100),
+makeAchievement('lift100','STRENGTH','IRON BEGINNER','철의 시작','스쿼트·벤치·데드리프트 합계 100kg 달성','bronze','⚒',s=>s.liftTotal>=100),
+makeAchievement('lift200','STRENGTH','IRON TRIO','철의 삼위일체','3대 합계 200kg 달성','bronze','⚒',s=>s.liftTotal>=200),
+makeAchievement('lift300','STRENGTH','THREE HUNDRED','3대 300 클럽','3대 합계 300kg 달성','silver','🏋',s=>s.liftTotal>=300),
+makeAchievement('lift400','STRENGTH','FOUR HUNDRED','강철의 힘','3대 합계 400kg 달성','silver','⚔',s=>s.liftTotal>=400),
+makeAchievement('lift500','STRENGTH','FIVE HUNDRED','괴력의 소유자','3대 합계 500kg 달성','gold','💥',s=>s.liftTotal>=500),
+makeAchievement('lift600','STRENGTH','SIX HUNDRED','파워 엘리트','3대 합계 600kg 달성','gold','✹',s=>s.liftTotal>=600),
+makeAchievement('lift700','STRENGTH','SEVEN HUNDRED','아이언 마스터','3대 합계 700kg 달성','platinum','♜',s=>s.liftTotal>=700),
+makeAchievement('lift800','STRENGTH','EIGHT HUNDRED','리빙 레전드','3대 합계 800kg 달성','legendary','♛',s=>s.liftTotal>=800),
+makeAchievement('work01','WORKOUT','FIRST SESSION','첫 출전','첫 운동 기록 완료','bronze','🏁',s=>s.workoutDays>=1),
+makeAchievement('work10','WORKOUT','TEN SESSIONS','꾸준한 시작','운동 기록 10일 달성','bronze','🔥',s=>s.workoutDays>=10),
+makeAchievement('work25','WORKOUT','QUARTER CENTURY','루틴 정착','운동 기록 25일 달성','silver','⚡',s=>s.workoutDays>=25),
+makeAchievement('work50','WORKOUT','FIFTY STRONG','훈련가','운동 기록 50일 달성','silver','🏋',s=>s.workoutDays>=50),
+makeAchievement('work100','WORKOUT','CENTURION','백전노장','운동 기록 100일 달성','gold','🛡',s=>s.workoutDays>=100),
+makeAchievement('work200','WORKOUT','TWO HUNDRED','철의 일상','운동 기록 200일 달성','gold','⚒',s=>s.workoutDays>=200),
+makeAchievement('work365','WORKOUT','YEAR OF POWER','1년의 투지','운동 기록 365일 달성','platinum','☀',s=>s.workoutDays>=365),
+makeAchievement('work500','WORKOUT','UNBREAKABLE','불굴의 의지','운동 기록 500일 달성','legendary','💎',s=>s.workoutDays>=500),
+makeAchievement('habit01','HABIT','ONE SMALL WIN','작은 승리','습관 첫 완료','bronze','✓',s=>s.habitDone>=1),
+makeAchievement('habit50','HABIT','HABIT BUILDER','습관 설계자','습관 누적 완료 50회','bronze','✧',s=>s.habitDone>=50),
+makeAchievement('habit100','HABIT','CONSISTENCY','꾸준함의 힘','습관 누적 완료 100회','silver','🔥',s=>s.habitDone>=100),
+makeAchievement('habit300','HABIT','DISCIPLINE MASTER','자기관리 마스터','습관 누적 완료 300회','gold','👑',s=>s.habitDone>=300),
+makeAchievement('streak07','HABIT','SEVEN DAY STREAK','7일의 약속','하나의 습관을 7일 연속 완료','bronze','🌱',s=>s.habitStreak>=7),
+makeAchievement('streak14','HABIT','TWO WEEK STREAK','흔들림 없는 2주','하나의 습관을 14일 연속 완료','silver','🌿',s=>s.habitStreak>=14),
+makeAchievement('streak30','HABIT','MONTH OF DISCIPLINE','한 달의 루틴','하나의 습관을 30일 연속 완료','gold','🌳',s=>s.habitStreak>=30),
+makeAchievement('streak100','HABIT','HABIT LEGEND','습관의 전설','하나의 습관을 100일 연속 완료','legendary','🌟',s=>s.habitStreak>=100),
+makeAchievement('diet01','DIET','FIRST BITE','첫 식단 기록','첫 식사 기록 완료','bronze','🍽',s=>s.meals>=1),
+makeAchievement('diet50','DIET','FUEL TRACKER','영양 기록가','식사 기록 50개 달성','bronze','🥗',s=>s.meals>=50),
+makeAchievement('diet100','DIET','NUTRITION PRO','영양 전문가','식사 기록 100개 달성','silver','🥑',s=>s.meals>=100),
+makeAchievement('diet300','DIET','MASTER OF FUEL','완벽한 연료 관리','식사 기록 300개 달성','gold','🍱',s=>s.meals>=300),
+makeAchievement('protein07','DIET','PROTEIN WEEK','단백질 챌린저','하루 단백질 목표 7일 달성','silver','🥩',s=>s.proteinDays>=7),
+makeAchievement('protein30','DIET','PROTEIN ELITE','단백질 엘리트','하루 단백질 목표 30일 달성','platinum','💪',s=>s.proteinDays>=30),
+makeAchievement('bulkStart','BULK & CUT','BULK INITIATED','벌크업 여정','벌크업 목표 설정','bronze','⬆',s=>s.goalMode==='bulk'),
+makeAchievement('bulk02','BULK & CUT','BULK BUILDER','매스 업','벌크업 시작 체중보다 2kg 증가','silver','🦬',s=>s.goalMode==='bulk'&&s.goalDelta>=2),
+makeAchievement('bulkGoal','BULK & CUT','BULK MASTER','벌크업 마스터','설정한 벌크업 목표 체중 달성','gold','🏆',s=>s.goalMode==='bulk'&&s.goalReached),
+makeAchievement('cutStart','BULK & CUT','CUT INITIATED','커팅 여정','커팅 목표 설정','bronze','⬇',s=>s.goalMode==='cut'),
+makeAchievement('cut02','BULK & CUT','LEAN MACHINE','정교한 커팅','커팅 시작 체중보다 2kg 감량','silver','💎',s=>s.goalMode==='cut'&&s.goalDelta<=-2),
+makeAchievement('cutGoal','BULK & CUT','CUTTING ACE','커팅 에이스','설정한 커팅 목표 체중 달성','gold','🦅',s=>s.goalMode==='cut'&&s.goalReached),
+makeAchievement('quest01','SPECIAL','QUEST ACCEPTED','모험의 시작','일일 퀘스트 첫 완료','bronze','📜',s=>s.questDays>=1),
+makeAchievement('quest30','SPECIAL','QUEST ADDICT','퀘스트 러너','일일 퀘스트 완료일 30일 달성','silver','🗺',s=>s.questDays>=30),
+makeAchievement('quest100','SPECIAL','QUEST MASTER','퀘스트 마스터','일일 퀘스트 완료일 100일 달성','gold','⚔',s=>s.questDays>=100),
+makeAchievement('perfect01','SPECIAL','PERFECT DAY','완벽한 하루','하루의 일일 퀘스트 4개 모두 완료','silver','🌠',s=>s.perfectQuestDays>=1),
+makeAchievement('perfect07','SPECIAL','PERFECT WEEK','완벽한 한 주','일일 퀘스트 4개를 모두 완료한 날 7일 달성','platinum','✨',s=>s.perfectQuestDays>=7),
+makeAchievement('perfect30','SPECIAL','PERFECT MONTH','완벽한 한 달','일일 퀘스트 4개를 모두 완료한 날 30일 달성','legendary','🌌',s=>s.perfectQuestDays>=30),
+makeAchievement('weekly10','SPECIAL','WEEKLY CHAMPION','주간 미션 챔피언','주간 미션 10개 완료','gold','🏅',s=>s.weeklyMissions>=10)
+];
+function achievementStats(){
+ const workoutDays=new Set((data.workouts||[]).map(w=>w.date)).size;
+ const habitLogs=data.habitLogs||{},habitDone=Object.values(habitLogs).reduce((n,day)=>n+Object.values(day||{}).filter(x=>x?.done).length,0);
+ let habitStreak=0;
+ for(const id of (data.habits||[]).map(h=>h.id)){
+  const dates=Object.entries(habitLogs).filter(([,v])=>v?.[id]?.done).map(([d])=>d).sort();
+  let run=0,best=0,prev='';
+  for(const d of dates){run=prev&&shiftDate(prev,1)===d?run+1:1;best=Math.max(best,run);prev=d}
+  habitStreak=Math.max(habitStreak,best);
+ }
+ const proteinByDay={};for(const m of data.meals||[])proteinByDay[m.date]=(proteinByDay[m.date]||0)+(+m.protein||0);
+ const proteinDays=Object.values(proteinByDay).filter(v=>v>=goal().protein).length;
+ let lift={squat:0,bench:0,deadlift:0};
+ for(const w of data.workouts||[])for(const ex of w.exercises||[]){
+  const name=String(ex.name||'');
+  const key=/squat|스쿼트/i.test(name)?'squat':/bench|벤치/i.test(name)?'bench':/deadlift|데드리프트/i.test(name)?'deadlift':null;
+  if(!key)continue;
+  for(const set of ex.sets||[])lift[key]=Math.max(lift[key],+set.weight||0);
+ }
+ const goalData=data.weightGoal||null,latest=(data.weightLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)).at(-1);
+ const start=+(goalData?.startWeight||0),current=+(latest?.weight||0),target=+(goalData?.target||0);
+ const goalDelta=goalData&&start&&current?current-start:0;
+ const goalReached=!!(goalData&&target&&current&&(goalData.mode==='bulk'?current>=target:current<=target));
+ const claims=data.questClaims||{},questDays=Object.values(claims).filter(day=>Object.values(day||{}).some(Boolean)).length;
+ const perfectQuestDays=Object.values(claims).filter(day=>['strength','nutrition','cardio','consistency'].every(k=>day?.[k])).length;
+ const weeklyMissions=Object.values(data.weeklyMissionClaims||{}).reduce((n,week)=>n+Object.values(week||{}).filter(Boolean).length,0);
+ return {level:level(),workoutDays,meals:(data.meals||[]).length,habitDone,habitStreak,proteinDays,liftTotal:lift.squat+lift.bench+lift.deadlift,goalMode:goalData?.mode||'',goalDelta,goalReached,questDays,perfectQuestDays,weeklyMissions};
+}
+function evaluateAchievements(){
+ data.achievementUnlocks??=[];
+ const unlocked=new Set(data.achievementUnlocks.map(x=>typeof x==='string'?x:x.id));
+ const stats=achievementStats(),fresh=[];
+ for(const a of ACHIEVEMENTS)if(!unlocked.has(a.id)&&a.check(stats)){
+  data.achievementUnlocks.push({id:a.id,date:today()});
+  pendingAchievementUnlocks.push(a);fresh.push(a);
+ }
+ return fresh.length;
+}
+function badgeArtwork(a,locked=false){
+ const palette={bronze:['#d49a68','#62402b'],silver:['#dce7f0','#526477'],gold:['#f2d18a','#80602e'],platinum:['#a9e3f3','#315d79'],legendary:['#d5b7ff','#513d79']}[a.tier]||['#80d1f5','#315d79'];
+ const id='badge-'+a.id;
+ return '<svg class="achievement-art" viewBox="0 0 100 112" role="img" aria-label="'+(locked?'잠긴 업적':a.title)+'"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".9"/><stop offset=".32" stop-color="'+palette[0]+'"/><stop offset="1" stop-color="'+palette[1]+'"/></linearGradient></defs><path d="M50 4 91 20 85 70 50 107 15 70 9 20Z" fill="#080e17" stroke="'+palette[0]+'" stroke-opacity=".75" stroke-width="2"/><path d="M50 10 84 24 79 67 50 96 21 67 16 24Z" fill="url(#'+id+')" stroke="#fff" stroke-opacity=".65" stroke-width="1"/><path d="M50 18 72 29 69 63 50 82 31 63 28 29Z" fill="#0d1825" stroke="'+palette[0]+'" stroke-width="1.5"/><circle cx="50" cy="50" r="20" fill="'+palette[0]+'" fill-opacity=".12"/><text x="50" y="59" text-anchor="middle" font-size="25" fill="'+(locked?'#6d7b89':'#f6f0df')+'">'+(locked?'?':a.symbol)+'</text><path d="M23 78 50 96 77 78" fill="none" stroke="'+palette[0]+'" stroke-width="2"/></svg>';
+}
+function renderAchievements(){
+ const records=data.achievementUnlocks||[],map=new Map(records.map(x=>[typeof x==='string'?x:x.id,x]));
+ const category=$('achievementCategory')?.value||'all';
+ let list=ACHIEVEMENTS.filter(a=>(category==='all'||a.category===category));
+ list=list.filter(a=>achievementFilter==='all'||(achievementFilter==='unlocked'?map.has(a.id):!map.has(a.id)));
+ $('achievementSummary').innerHTML='<div><strong>'+map.size+' / '+ACHIEVEMENTS.length+'</strong><span>BADGES COLLECTED</span></div><div class="achievement-summary-track"><i style="width:'+(map.size/ACHIEVEMENTS.length*100)+'%"></i></div><small>'+Math.round(map.size/ACHIEVEMENTS.length*100)+'% COLLECTION COMPLETE</small>';
+ $('achievementGrid').innerHTML=list.map(a=>{
+  const rec=map.get(a.id),got=!!rec;
+  return '<article class="achievement-card '+(got?'unlocked':'locked')+'"><div class="achievement-art-wrap">'+badgeArtwork(a,!got)+'</div><div class="achievement-card-copy"><small>'+a.category+'</small><strong>'+(got?a.title:'???')+'</strong><span>'+(got?a.honor:'미획득')+'</span><p>'+a.desc+'</p><small class="achievement-date">'+(got&&rec.date?dateLabel(rec.date):'LOCKED · 조건 달성 시 해금')+'</small></div></article>';
+ }).join('')||'<div class="empty-state">이 조건에 해당하는 배지가 없어요.</div>';
+ $('achievementFilters').querySelectorAll('[data-achievement-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.achievementFilter===achievementFilter));
+}
+function showNextAchievement(){
+ const dlg=$('achievementUnlockDialog');
+ if(!dlg||dlg.open||document.querySelector('#levelUpDialog[open]')||!pendingAchievementUnlocks.length)return;
+ const a=pendingAchievementUnlocks.shift();
+ $('achievementUnlockBadge').innerHTML=badgeArtwork(a,false);
+ $('achievementUnlockTitle').textContent=a.title;
+ $('achievementUnlockHonor').textContent='칭호 획득 · '+a.honor;
+ $('achievementUnlockDesc').textContent=a.desc;
+ dlg.classList.remove('unlock-animate');void dlg.offsetWidth;dlg.classList.add('unlock-animate');dlg.showModal();
+}
+function openWeightGoalEditor(){
+ const logs=(data.weightLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1);
+ if(!last){alert('먼저 현재 체중을 한 번 기록해 주세요.');$('weightInput').focus();return}
+ const g=data.weightGoal||{};
+ $('weightGoalMode').value=g.mode||'bulk';$('weightGoalTarget').value=g.target??'';
+ $('weightGoalCurrent').textContent='현재 체중 '+last.weight.toFixed(1)+' kg';
+ $('weightGoalDialog').showModal();
+}
+function renderWeightGoal(){
+ const el=$('weightGoalCard');if(!el)return;
+ const logs=(data.weightLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1),g=data.weightGoal;
+ if(!g){el.innerHTML='<div class="weight-goal-empty"><div><small>PERSONAL TARGET</small><strong>목표 체중을 설정해 보세요.</strong><span>벌크업 또는 커팅 목표와 진행률을 관리할 수 있어요.</span></div><button type="button" class="secondary" id="editWeightGoal">SET GOAL</button></div>'}
+ else if(!last){el.innerHTML='<div class="weight-goal-empty"><div><small>WEIGHT GOAL</small><strong>현재 체중 기록이 필요해요.</strong></div><button type="button" class="secondary" id="editWeightGoal">EDIT GOAL</button></div>'}
+ else{
+  const start=+(g.startWeight||last.weight),target=+g.target,current=+last.weight,delta=current-start,distance=Math.abs(target-start),progress=distance?Math.max(0,Math.min(100,(delta/(target-start))*100)):0,remaining=Math.abs(target-current),reached=g.mode==='bulk'?current>=target:current<=target;
+  const mode=g.mode==='bulk'?'BULKING':'CUTTING';
+  el.innerHTML='<div class="weight-goal-head"><div><small>PERSONAL TARGET</small><strong>'+mode+'</strong></div><button type="button" class="text-button" id="editWeightGoal">EDIT ↗</button></div><div class="weight-goal-values"><div><small>CURRENT</small><strong>'+current.toFixed(1)+' <i>kg</i></strong></div><div class="weight-goal-arrow">→</div><div><small>TARGET</small><strong>'+target.toFixed(1)+' <i>kg</i></strong></div></div><div class="weight-goal-track"><i style="width:'+progress.toFixed(1)+'%"></i></div><div class="weight-goal-foot"><span>'+(reached?'🎉 GOAL ACHIEVED':'남은 체중 <b>'+remaining.toFixed(1)+' kg</b>')+'</span><strong>'+Math.round(progress)+'%</strong></div>';
+ }
+ const button=el.querySelector('#editWeightGoal');if(button)button.onclick=openWeightGoalEditor;
+}
+
+function showLevelUp(info){if(!info||suppressLevelUp||!$('levelUpDialog'))return;let old=rankForLevel(info.from),next=rankForLevel(info.to),promoted=old.name!==next.name,dlg=$('levelUpDialog');$('levelUpFrom').textContent=info.from;$('levelUpTo').textContent=info.to;$('levelUpRank').textContent=next.name;$('levelUpEmblem').innerHTML=rankEmblem(next);$('levelUpRankNotice').classList.toggle('hidden',!promoted);dlg.classList.toggle('rank-promotion',promoted);dlg.classList.remove('levelup-animate');void dlg.offsetWidth;dlg.classList.add('levelup-animate');$('levelUpMessage').textContent=promoted?'새로운 등급을 획득했습니다. 지금까지의 노력이 증명됐어요.':'한 단계 더 성장했습니다. 지금의 흐름을 이어가세요.';dlg.showModal()}function grantXP(amount){let from=level();data.xp=Math.max(0,(+data.xp||0)+amount);let to=level();if(to>from){let rank=rankForLevel(to),old=rankForLevel(from);data.rankHistory??=[];if(old.name!==rank.name&&!data.rankHistory.some(x=>x.rank===rank.name))data.rankHistory.push({rank:rank.name,level:to,date:today()});let best=RANKS.find(x=>x.name===(data.highestRank||'IRON'))||RANKS[0];if(RANKS.indexOf(rank)>RANKS.indexOf(best))data.highestRank=rank.name;pendingLevelUp={from,to};}return to>from}const COLORS={PUSH:'#78b9e8',PULL:'#82c5a5',LEGS:'#d6a16e',CARDIO:'#ad98ca'},dateLabel=d=>new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),level=()=>Math.max(1,Math.floor(data.xp/100)+1),currentXP=()=>data.xp%100;
 function openDB(){return new Promise((ok,no)=>{let r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
 function readSave(){return new Promise((ok,no)=>{let r=db.transaction(STORE).objectStore(STORE).get('main');r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
-function writeSave(){return new Promise((ok,no)=>{let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(data,'main');tx.oncomplete=()=>{$('saveStatus').textContent='SAVED LOCALLY';if(pendingLevelUp){let p=pendingLevelUp;pendingLevelUp=null;setTimeout(()=>showLevelUp(p),180)}ok()};tx.onerror=()=>no(tx.error)})}
+function writeSave(){evaluateAchievements();return new Promise((ok,no)=>{let tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(data,'main');tx.oncomplete=()=>{$('saveStatus').textContent='SAVED LOCALLY';if(pendingLevelUp){let p=pendingLevelUp;pendingLevelUp=null;setTimeout(()=>showLevelUp(p),180)}else setTimeout(showNextAchievement,180);ok()};tx.onerror=()=>no(tx.error)})}
 function goal(){return {...{calories:2000,mode:'grams',protein:150,carbs:200,fat:67,proteinRatio:30,carbsRatio:40,fatRatio:30},...(data.nutritionGoal||{})}}
 function targetGrams(){let g=goal();return {carbs:g.calories*g.carbsRatio/400,protein:g.calories*g.proteinRatio/400,fat:g.calories*g.fatRatio/900}}
 function normalizeWorkouts(rows){let map=new Map();for(let w of rows||[]){let k=w.date+'|'+w.type;if(Array.isArray(w.exercises)){if(!map.has(k))map.set(k,{...w,exercises:w.exercises});else map.get(k).exercises.push(...w.exercises);continue}if(!map.has(k))map.set(k,{id:uid(),date:w.date,type:w.type,exercises:[],xpAwarded:0});let g=map.get(k),sets=w.setDetails?.length?w.setDetails:[{weight:+w.weight||0,reps:+w.reps||0}];g.exercises.push({id:w.id||uid(),name:w.exercise||w.type,sets:w.type==='CARDIO'?[]:sets,minutes:+w.minutes||0});g.xpAwarded=(g.xpAwarded||0)+1}return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date))}
@@ -177,9 +318,9 @@ function reportGoalComparison(id,current,previous,target,unit=''){
 }
 function renderReport(){
  $('reportPrev').disabled=reportOffset<=-120;$('reportNext').disabled=reportOffset>=0;
- const isExercise=reportMode==='exercise';$('reportPeriodNav').classList.toggle('hidden',isExercise);$('reportExercisePicker').classList.toggle('hidden',!isExercise);$('reportSummary').classList.toggle('hidden',isExercise);$('reportExercisePanel').classList.toggle('hidden',!isExercise);
+ const isExercise=reportMode==='exercise',isAchievements=reportMode==='achievements';$('reportPeriodNav').classList.toggle('hidden',isExercise||isAchievements);$('reportExercisePicker').classList.toggle('hidden',!isExercise);$('reportSummary').classList.toggle('hidden',isExercise||isAchievements);$('reportExercisePanel').classList.toggle('hidden',!isExercise);$('reportAchievementsPanel').classList.toggle('hidden',!isAchievements);
  document.querySelectorAll('[data-report-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.reportMode===reportMode));
- if(isExercise){renderExerciseChart();return}
+ if(isAchievements){renderAchievements();return}if(isExercise){renderExerciseChart();return}
  const {start,end}=reportRange();let prevStart,prevEnd;
  if(reportMode==='week'){prevStart=shiftDate(start,-7);prevEnd=shiftDate(end,-7)}
  else{const d=new Date(start+'T12:00:00'),p=new Date(d.getFullYear(),d.getMonth()-1,1),last=new Date(d.getFullYear(),d.getMonth(),0);prevStart=isoDate(p);prevEnd=isoDate(last)}
@@ -207,7 +348,8 @@ function renderReport(){
 }
 function renderCharacterPreview(){const stages=[{file:1,from:1,to:9},{file:2,from:10,to:19},{file:3,from:20,to:29},{file:4,from:30,to:39},{file:6,from:40,to:49},{file:5,from:50,to:59},{file:7,from:60,to:69},{file:8,from:70,to:79},{file:9,from:80,to:89},{file:10,from:90,to:9999}],lv=level(),current=stages.findIndex(s=>lv>=s.from&&lv<=s.to);$('characterPreviewStages').innerHTML=stages.map((s,i)=>'<div class="character-stage '+(i===current?'current':'')+' '+(i<current?'unlocked':'future')+'"><img src="./stage'+String(s.file).padStart(2,'0')+'_cutout.png" alt="Stage '+String(s.file).padStart(2,'0')+'"><strong>'+((s.to===9999?'LV. 90+':'LV. '+s.from+'–'+s.to))+'</strong><small>'+(i===current?'CURRENT STAGE':i<current?'PREVIOUS FORM':'FUTURE EVOLUTION')+'</small></div>').join('')}
 function renderHome(){let lv=level();$('level').textContent=lv;renderRank();$('xpText').textContent=`${currentXP()} / 100 XP`;$('xpBar').style.width=`${currentXP()}%`;let stage=lv>=90?10:lv>=80?9:lv>=70?8:lv>=60?7:lv>=50?5:lv>=40?6:lv>=30?4:lv>=20?3:lv>=10?2:1;const stageFiles={1:'stage01_cutout.png',2:'stage02_cutout.png',3:'stage03_cutout.png',4:'stage04_cutout.png',5:'stage05_cutout.png',6:'stage06_cutout.png',7:'stage07_cutout.png',8:'stage08_cutout.png',9:'stage09_cutout.png',10:'stage10_cutout.png'};$('stageLabel').textContent=`STAGE ${String(stage).padStart(2,'0')}`;$('avatar').onerror=()=>$('avatar').src='./placeholder.svg';$('avatar').src='./'+stageFiles[stage];let ws=todayWorkouts(),ms=todayMeals(),types=[...new Set(ws.map(w=>w.type))],tot=ms.reduce((a,m)=>({cal:a.cal+m.calories,p:a.p+m.protein}),{cal:0,p:0});$('todayWorkoutTypes').innerHTML=types.length?`<span class="status-state completed">COMPLETED</span><span class="status-main">${types.join(' · ')}</span><small class="status-extra">${ws.length} SESSION${ws.length===1?'':'S'} LOGGED</small>`:`<span class="status-state pending">PENDING</span><span class="status-main">No session</span><small class="status-extra">Ready when you are</small>`;let g=goal();$('todayCalories').innerHTML='<span class="home-intake">'+Math.round(tot.cal)+'</span><small class="home-goal">/ '+Math.round(g.calories)+' kcal</small>';$('todayProtein').innerHTML='<span class="home-intake">'+Math.round(tot.p)+'</span><small class="home-goal">/ '+Math.round(g.protein)+' g</small>';$('quests').innerHTML=quests().map(q=>`<div class="quest ${q.ok?'done':''}"><div class="quest-mark">${q.ok?'🔥':'○'}</div><div class="quest-copy"><strong>${q.title}</strong><small>${q.desc}</small>${q.progress!==undefined?`<small class="quest-progress">${q.progress} / ${q.total} 완료</small>`:''}</div><span class="quest-reward">${q.ok?'완료':q.noBonus?'습관 보상 포함':'🔥 +'+q.xp+' XP'}</span></div>`).join('');renderWeight();renderActivityStreak();renderWeeklyMissions()}
-function renderWeight(){let logs=data.weightLogs.slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1),first=logs[0];$('latestWeight').textContent=last?last.weight.toFixed(1)+' kg':'-- kg';$('weightChange').textContent=logs.length>1?((last.weight-first.weight>0?'+':'')+(last.weight-first.weight).toFixed(1)+' kg overall'):'No data';let a=logs.slice(-12),chart=$('weightChart');if(!a.length)chart.innerHTML='<div class="empty">Add your first weight record.</div>';else if(a.length===1)chart.innerHTML=`<div class="single-point"><i></i><strong>${a[0].weight.toFixed(1)} kg</strong><small>${dateLabel(a[0].date)}</small></div>`;else{let vals=a.map(x=>x.weight),lo=Math.min(...vals),hi=Math.max(...vals),range=Math.max(1,hi-lo),W=600,H=190,p=22,pts=a.map((x,i)=>({x:p+i*(W-2*p)/(a.length-1),y:123-(x.weight-lo)/range*100,...x}));chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Weight trend"><line x1="${p}" y1="145" x2="${W-p}" y2="145" class="chart-axis"/><polyline points="${pts.map(x=>x.x+','+x.y).join(' ')}" class="weight-line"/>${pts.map(x=>`<circle cx="${x.x}" cy="${x.y}" r="5" class="weight-dot"><title>${x.date}: ${x.weight} kg</title></circle><text x="${x.x}" y="${Math.max(12,x.y-10)}" class="weight-value" text-anchor="middle">${x.weight.toFixed(1)}</text><text x="${x.x}" y="184" class="weight-date" text-anchor="middle">${x.date.slice(5).replace('-','/')}</text>`).join('')}</svg>`} $('weightHistory').textContent=logs.slice(-4).reverse().map(x=>dateLabel(x.date)+' · '+x.weight.toFixed(1)+' kg').join('   /   ');$('weightDetail').innerHTML=logs.slice().reverse().map(x=>`<div class="record"><div class="record-head"><strong>${x.weight.toFixed(1)} kg</strong><small>${dateLabel(x.date)}</small><button class="delete" data-delete-weight="${x.date}">DELETE</button></div></div>`).join('')||'<div class="empty-state">No weight records yet.</div>'}
+function renderWeight(){let logs=data.weightLogs.slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1),first=logs[0];$('latestWeight').textContent=last?last.weight.toFixed(1)+' kg':'-- kg';$('weightChange').textContent=logs.length>1?((last.weight-first.weight>0?'+':'')+(last.weight-first.weight).toFixed(1)+' kg overall'):'No data';let a=logs.slice(-12),chart=$('weightChart');if(!a.length)chart.innerHTML='<div class="empty">Add your first weight record.</div>';else if(a.length===1)chart.innerHTML=`<div class="single-point"><i></i><strong>${a[0].weight.toFixed(1)} kg</strong><small>${dateLabel(a[0].date)}</small></div>`;else{let vals=a.map(x=>x.weight),lo=Math.min(...vals),hi=Math.max(...vals),range=Math.max(1,hi-lo),W=600,H=190,p=22,pts=a.map((x,i)=>({x:p+i*(W-2*p)/(a.length-1),y:123-(x.weight-lo)/range*100,...x}));chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Weight trend"><line x1="${p}" y1="145" x2="${W-p}" y2="145" class="chart-axis"/><polyline points="${pts.map(x=>x.x+','+x.y).join(' ')}" class="weight-line"/>${pts.map(x=>`<circle cx="${x.x}" cy="${x.y}" r="5" class="weight-dot"><title>${x.date}: ${x.weight} kg</title></circle><text x="${x.x}" y="${Math.max(12,x.y-10)}" class="weight-value" text-anchor="middle">${x.weight.toFixed(1)}</text><text x="${x.x}" y="184" class="weight-date" text-anchor="middle">${x.date.slice(5).replace('-','/')}</text>`).join('')}</svg>`} $('weightHistory').textContent=logs.slice(-4).reverse().map(x=>dateLabel(x.date)+' · '+x.weight.toFixed(1)+' kg').join('   /   ');$('weightDetail').innerHTML=logs.slice().reverse().map(x=>`<div class="record"><div class="record-head"><strong>${x.weight.toFixed(1)} kg</strong><small>${dateLabel(x.date)}</small><button class="delete" data-delete-weight="${x.date}">DELETE</button></div></div>`).join('')||'<div class="empty-state">No weight records yet.</div>';renderWeightGoal()}
+
 function addSet(w='',r=''){let n=$('sets').children.length+1,d=document.createElement('div');d.className='set-row';d.innerHTML=`<span>${n}</span><input type="number" min="0" step=".5" placeholder="KG" value="${w}"><input type="number" min="1" placeholder="REPS" value="${r}"><button type="button" class="remove-set">×</button>`;d.querySelector('button').onclick=()=>{d.remove();[...$('sets').children].forEach((x,i)=>x.firstElementChild.textContent=i+1)};$('sets').append(d)}
 function previousExercise(type,name,date){let norm=s=>(s||'').trim().toLowerCase();for(let w of data.workouts.filter(x=>x.type===type&&x.date<date).sort((a,b)=>b.date.localeCompare(a.date))){let e=(w.exercises||[]).find(x=>norm(x.name)===norm(name));if(e?.sets?.length)return {w,e}}return null}
 function exerciseMatches(query){let q=query.trim().toLowerCase();if(q.length<1)return [];let seen=new Map();for(let w of data.workouts.filter(x=>x.type===$('workoutType').value).sort((a,b)=>b.date.localeCompare(a.date))){for(let e of w.exercises||[]){let k=e.name.trim().toLowerCase();if(k.startsWith(q)&&!seen.has(k))seen.set(k,e.name)}}return [...seen.values()].slice(0,7)}
@@ -262,7 +404,7 @@ $('calendarPrev').onclick=()=>{calMonth=new Date(calMonth.getFullYear(),calMonth
 $('workoutHistory').onclick=e=>{let b=e.target.closest('[data-open-record]');if(b)showDetails(b.dataset.openRecord)};
 $('deleteWorkoutRecord').onclick=async()=>{let id=$('deleteWorkoutRecord').dataset.deleteWorkout,w=data.workouts.find(x=>x.id===id);if(!w)return;data.workouts=data.workouts.filter(x=>x.id!==id);data.xp=Math.max(0,data.xp-25*(w.xpAwarded||1));await writeSave();$('workoutDetailDialog').close();renderHistory();renderHome()};
 $('weightForm').onsubmit=async e=>{e.preventDefault();let date=$('weightDate').value||today(),w=Math.round(+$('weightInput').value*10)/10;if(!w||w<20||w>300)return alert('Enter a valid weight between 20 and 300 kg.');let i=data.weightLogs.findIndex(x=>x.date===date),item={date,weight:w};if(i>=0)data.weightLogs[i]=item;else data.weightLogs.push(item);data.weightLogs.sort((a,b)=>a.date.localeCompare(b.date));$('weightInput').value='';await writeSave();renderWeight();renderHome()};
-$('openWeight').onclick=()=>{$('weightDialog').showModal();renderWeight()};$('closeWeight').onclick=()=>$('weightDialog').close();$('closeLevelUp').onclick=()=>$('levelUpDialog').close();
+$('openWeight').onclick=()=>{$('weightDialog').showModal();renderWeight()};$('closeWeight').onclick=()=>$('weightDialog').close();$('weightGoalForm').onsubmit=async e=>{e.preventDefault();let logs=(data.weightLogs||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)),last=logs.at(-1),mode=$('weightGoalMode').value,target=Math.round(+$('weightGoalTarget').value*10)/10;if(!last)return alert('먼저 현재 체중을 기록해 주세요.');if(!Number.isFinite(target)||target<20||target>300)return alert('목표 체중을 20~300kg 사이로 입력해 주세요.');if(mode==='bulk'&&target<=last.weight)return alert('벌크업 목표는 현재 체중보다 높게 설정해 주세요.');if(mode==='cut'&&target>=last.weight)return alert('커팅 목표는 현재 체중보다 낮게 설정해 주세요.');data.weightGoal={mode,target,startWeight:last.weight,startDate:today()};await writeSave();$('weightGoalDialog').close();renderWeight()};$('closeWeightGoal').onclick=()=>$('weightGoalDialog').close();$('achievementFilters').onclick=e=>{let b=e.target.closest('[data-achievement-filter]');if(!b)return;achievementFilter=b.dataset.achievementFilter;renderAchievements()};$('achievementCategory').onchange=renderAchievements;$('closeAchievementUnlock').onclick=()=>{$('achievementUnlockDialog').close();setTimeout(showNextAchievement,120)};$('closeLevelUp').onclick=()=>{$('levelUpDialog').close();setTimeout(showNextAchievement,120)};
 $('mealCards').addEventListener('input',e=>{let m=e.target.closest('input[id^="mealName"]');if(m)renderFoodSuggestions(+m.id.replace('mealName',''))});
 $('mealCards').onclick=async e=>{let f=e.target.closest('[data-food-select]');if(f){let [n,i]=f.dataset.foodSelect.split(':').map(Number),box=$('foodSuggestions'+n),names=JSON.parse(box.dataset.names||'[]'),food=foodLibrary().find(m=>m.name===names[i]);if(food){$('mealName'+n).value=food.name;$('mealCal'+n).value=food.calories;$('mealCarb'+n).value=food.carbs;$('mealPro'+n).value=food.protein;$('mealFat'+n).value=food.fat;box.classList.add('hidden')}return}let t=e.target.closest('[data-meal-toggle]');if(t){$('mealContent'+t.dataset.mealToggle).classList.toggle('hidden');return}let s=e.target.closest('[data-save-meal]');if(s){let n=+s.dataset.saveMeal,name=$('mealName'+n).value.trim();if(!name)return alert('Enter food name.');data.meals.push({id:uid(),date:today(),meal:n,name,calories:+$('mealCal'+n).value||0,carbs:+$('mealCarb'+n).value||0,protein:+$('mealPro'+n).value||0,fat:+$('mealFat'+n).value||0});grantXP(10);showXPGain(10,'MEAL LOGGED');await rewardQuests();await claimWeeklyMissionRewards();renderDiet();renderHome();return}let d=e.target.closest('[data-delete-meal]');if(d){data.meals=data.meals.filter(m=>m.id!==d.dataset.deleteMeal);data.xp=Math.max(0,data.xp-10);await writeSave();renderDiet();renderHome()}};
 document.addEventListener('click',async e=>{let b=e.target.closest('[data-delete-weight]');if(b){data.weightLogs=data.weightLogs.filter(x=>x.date!==b.dataset.deleteWeight);await writeSave();renderWeight();renderHome()}});
@@ -273,5 +415,5 @@ $('openGoals').onclick=()=>{let g=goal();$('goalCalories').value=g.calories;$('g
 $('goalForm').onsubmit=async e=>{e.preventDefault();syncMacros();let c=+$('goalCalories').value,r=+$('ratioCarbs').value+ +$('ratioProtein').value+ +$('ratioFat').value;if(c<=0)return alert('Enter macro grams to set a calorie target.');if(Math.abs(r-100)>.2)return alert('Macro ratio must total 100%. Adjust the ratio values.');let ratioTotal=(+$('ratioCarbs').value||0)+(+$('ratioProtein').value||0)+(+$('ratioFat').value||0),normalizedCarbs=+((+$('ratioCarbs').value||0)/ratioTotal*100).toFixed(1),normalizedProtein=+((+$('ratioProtein').value||0)/ratioTotal*100).toFixed(1),normalizedFat=+(100-normalizedCarbs-normalizedProtein).toFixed(1);$('ratioCarbs').value=normalizedCarbs.toFixed(1);$('ratioProtein').value=normalizedProtein.toFixed(1);$('ratioFat').value=normalizedFat.toFixed(1);syncMacros();data.nutritionGoal={...goal(),calories:c,mode:'grams',carbsRatio:normalizedCarbs,proteinRatio:normalizedProtein,fatRatio:normalizedFat,carbs:+$('gramsCarbs').value,protein:+$('gramsProtein').value,fat:+$('gramsFat').value};await writeSave();$('goalDialog').close();renderDiet()};
 $('exportData').onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='life-rpg-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url)};
 $('importData').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x||!Array.isArray(x.workouts)||!Array.isArray(x.meals))throw Error();data={...data,...x};data.workouts=normalizeWorkouts(data.workouts);await writeSave();renderHome();renderHistory();renderDiet();alert('Backup restored.')}catch{alert('Invalid backup file.')}e.target.value=''};
-async function init(){db=await openDB();let saved=await readSave();if(saved){data={...data,...saved};data.workouts=normalizeWorkouts(data.workouts)}data.habits??=[];data.habitLogs??={};data.habitVersions??=[];data.rankHistory??=[];ensureHabitVersions();data.highestRank??=rankForLevel(level()).name;$('todayLabel').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();['weightDate','workoutDate','workoutHistoryDate'].forEach(id=>$(id).value=today());$('sets').innerHTML='';addSet();renderDraft();await rewardQuests(false);getWeeklyMissionSet();await claimWeeklyMissionRewards();renderHome();renderHistory();renderDiet();renderHabits();renderReport();$('exercise').dataset.selected='false';suppressLevelUp=false;if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{})}
+async function init(){db=await openDB();let saved=await readSave();if(saved){data={...data,...saved};data.workouts=normalizeWorkouts(data.workouts)}data.habits??=[];data.habitLogs??={};data.habitVersions??=[];data.rankHistory??=[];data.achievementUnlocks??=[];data.weightGoal??=null;ensureHabitVersions();data.highestRank??=rankForLevel(level()).name;$('todayLabel').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();['weightDate','workoutDate','workoutHistoryDate'].forEach(id=>$(id).value=today());$('sets').innerHTML='';addSet();renderDraft();await rewardQuests(false);getWeeklyMissionSet();await claimWeeklyMissionRewards();renderHome();renderHistory();renderDiet();renderHabits();renderReport();$('exercise').dataset.selected='false';suppressLevelUp=false;if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{})}
 init().catch(e=>{console.error(e);alert('Unable to initialize local storage. Please use Safari or Chrome with site storage enabled.')});
