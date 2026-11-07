@@ -87,8 +87,8 @@
 .recommendation-note{font-size:10px;line-height:1.5;color:#a9bacb;margin:0 0 12px}
 .recommendation-previous{display:block;margin-top:9px;font-size:8px;line-height:1.5;letter-spacing:.4px;color:var(--muted)}
 /* Match HOME nutrition values to DIET accents */
-.home-calories{color:var(--text);text-shadow:0 0 8px #edf3f822}
-.home-protein{color:var(--protein);text-shadow:0 0 10px #65bfff55}
+.status-tile strong.home-calories{color:var(--text);text-shadow:0 0 8px #edf3f822}
+.status-tile strong.home-protein{color:var(--protein);text-shadow:0 0 10px #65bfff55}
 /* Native-style fixed bottom navigation with safe-area support */
 .app-shell{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)}
 .tabs{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(calc(100% - 24px),644px);margin:0;padding:5px 5px calc(env(safe-area-inset-bottom) + 5px);border-radius:16px 16px 0 0;background:#0d141ef2;border:1px solid #29394b;border-bottom:0;box-shadow:0 -8px 28px #0005;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
