@@ -265,3 +265,5 @@ main{padding-bottom:14px}
 .habit-weekdays input{width:auto}
 .habit-form-hint{font-size:9px;color:#9bafc2;line-height:1.6;margin:12px 0}
 @media(max-width:390px){.tab{font-size:7px;letter-spacing:0}.home-rank{gap:6px;padding:7px}.rank-mini-progress{font-size:6px}.habit-form-grid{gap:6px}}
+
+.habit-editor-actions{display:flex;gap:9px;margin-top:14px}.habit-editor-actions>*{flex:1}.habit-rest-label{font-size:9px;color:#8295a8}.habit-card.not-due{opacity:.72}
