@@ -469,3 +469,21 @@ button,a,select{touch-action:manipulation}
 @keyframes levelTextReveal{0%{opacity:0;letter-spacing:12px;filter:blur(5px)}100%{opacity:1;letter-spacing:5px;filter:blur(0)}}
 @media(max-width:380px){.achievement-grid{gap:7px}.achievement-card{padding:10px 6px}.achievement-art-wrap{width:66px;height:74px}.achievement-card-copy>strong{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.achievement-unlock-badge,.levelup-modal.levelup-animate .levelup-content,.levelup-modal.levelup-animate .levelup-glow,.levelup-modal.levelup-animate .levelup-kicker,.levelup-modal.levelup-animate .levelup-emblem{animation:none!important}}
+
+/* v25 · Diet history calendar and selected-day meal records */
+.diet-calendar-panel{margin-bottom:14px}
+.diet-calendar-day.has-diet .calendar-dots{width:100%;justify-content:center}
+.diet-calendar-day.has-diet .calendar-dots b{width:5px;height:5px;background:#82c5a5;box-shadow:0 0 7px #82c5a577}
+.diet-calendar-legend{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:12px;color:var(--muted);font-size:9px}
+.diet-calendar-legend i{display:block;width:7px;height:7px;border-radius:50%;background:#82c5a5;box-shadow:0 0 7px #82c5a577}
+.diet-history-heading{margin-top:20px}
+.diet-history-records{display:grid;gap:8px}
+.diet-history-item{padding:12px 13px;border:1px solid #304258;border-radius:11px;background:linear-gradient(145deg,#172332,#101823)}
+.diet-history-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px}
+.diet-history-top>span{font-size:8px;letter-spacing:.8px;color:#91a8bc;font-weight:900}
+.diet-history-top strong{font-size:11px;color:#e0eaf2;overflow-wrap:anywhere}
+.diet-history-top>b{font-size:10px;color:#9bd7ed;white-space:nowrap}
+.diet-history-macros{display:flex;gap:13px;margin-top:8px;padding-top:8px;border-top:1px solid #2b3b4d;color:#9eafc0;font-size:9px}
+.diet-history-empty{padding:18px 12px;border:1px dashed #34475a;border-radius:11px;text-align:center;color:#8799ac;font-size:10px}
+.diet-calendar-day:active{transform:scale(.96)}
+.diet-calendar-day.has-diet.selected .calendar-dots b{background:#b4e7c8}
