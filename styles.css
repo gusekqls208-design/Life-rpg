@@ -323,3 +323,12 @@ main{padding-bottom:14px}
 .habit-streak-card span{font-size:8px;color:#a3b2c1;line-height:1.4}
 .quest-progress{display:block;margin-top:4px;color:#8dbcae!important}
 @media(max-width:360px){.habit-streak-grid{gap:6px}.habit-streak-card{padding:10px;gap:7px}.habit-streak-card strong{font-size:17px}}
+
+/* Rank promotion gets a distinct reveal beyond a normal level-up */
+.levelup-modal.rank-promotion{border-color:#e7c47e;box-shadow:0 20px 90px #000e,0 0 24px #d6b46c66,0 0 72px #d6b46c33}
+.rank-promotion .levelup-glow{width:320px;height:320px;background:radial-gradient(circle,#f0d18c55 0%,#b5c9e52b 34%,#8b73d018 55%,transparent 72%);animation:promotionPulse 2.2s ease-in-out infinite}
+.rank-promotion .levelup-kicker{color:#fff0c4;text-shadow:0 0 12px #f4d58b,0 0 32px #e4b45c}
+.rank-promotion .levelup-emblem{filter:drop-shadow(0 0 12px #f1d18b99) drop-shadow(0 0 28px #83d9f255);animation:rankReveal .9s cubic-bezier(.2,.8,.2,1) both,promotionAura 2.4s ease-in-out .9s infinite}
+.rank-promotion .levelup-rank-notice{background:linear-gradient(100deg,#71542a66,#b78d4d55);box-shadow:0 0 22px #e5c27b44}
+@keyframes promotionPulse{0%,100%{opacity:.72;transform:translate(-50%,-50%) scale(.94)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes promotionAura{0%,100%{filter:drop-shadow(0 0 10px #f1d18b66) drop-shadow(0 0 22px #83d9f244)}50%{filter:drop-shadow(0 0 18px #fff0bfcc) drop-shadow(0 0 38px #83d9f288)}}
