@@ -336,3 +336,48 @@ main{padding-bottom:14px}
 .rank-tier-2{filter:drop-shadow(0 0 3px #c4d5e044)}
 .rank-tier-3{filter:drop-shadow(0 0 4px #e5bd7055)}
 .rank-tier-4{filter:drop-shadow(0 0 5px #b9d2df66)}
+
+/* v19 · unified Player Status, character evolution preview and premium rank emblems */
+.hero.player-status{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:15px 16px;background:linear-gradient(120deg,#182638 0%,#111b28 62%,#101722 100%);border-color:#30445a}
+.player-status-top{display:grid;grid-template-columns:minmax(0,1fr) 82px 94px;align-items:center;gap:8px;min-width:0}
+.player-status .hero-copy{min-width:0}
+.player-status .level-line{margin:5px 0 10px}
+.player-status .level-line strong{font-size:40px}
+.player-status .xp-caption{gap:5px;font-size:8px;letter-spacing:.7px}
+.player-status .xp-caption span:last-child{white-space:nowrap}
+.player-status .home-rank{display:grid;justify-items:center;align-content:center;gap:3px;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;text-align:center;cursor:pointer}
+.player-status .rank-mini-emblem{width:65px;height:73px;filter:drop-shadow(0 4px 8px #000b) drop-shadow(0 0 7px color-mix(in srgb,var(--rank-glow,#d5b36b) 28%,transparent))}
+.player-status .rank-mini-copy{justify-items:center;gap:2px}
+.player-status .rank-mini-copy small{font-size:6px;letter-spacing:1px}
+.player-status .rank-mini-copy strong{font-size:10px;letter-spacing:.8px;overflow-wrap:anywhere}
+.player-status .rank-mini-copy span{font-size:6px;line-height:1.25}
+.player-status .rank-mini-progress{display:none}
+.player-status .avatar-wrap{width:94px;min-width:0;height:118px;padding:0;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:inherit}
+.player-status .avatar-wrap img{width:88px;height:100px;object-fit:contain}
+.player-status .avatar-wrap span{font-size:7px;letter-spacing:1px}
+.player-status .avatar-wrap:active{transform:scale(.97)}
+.player-status .hero-streak-inline{margin:0;padding-top:10px;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;border-top:1px solid #304257}
+.player-status .hero-streak-main>strong{font-size:22px}
+.player-status .hero-streak-week{grid-column:1/-1;grid-row:2}
+.player-status .hero-streak-best{grid-column:2;grid-row:1}
+@media(max-width:370px){.hero.player-status{padding:12px}.player-status-top{grid-template-columns:minmax(0,1fr) 70px 78px;gap:5px}.player-status .rank-mini-emblem{width:56px;height:63px}.player-status .avatar-wrap{width:78px;height:104px}.player-status .avatar-wrap img{width:76px;height:88px}.player-status .level-line strong{font-size:35px}.player-status .hero-streak-main>strong{font-size:20px}}
+.character-preview-note{margin:-8px 0 13px;color:#9eafc1;font-size:10px;line-height:1.5}
+.character-preview-stages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.character-stage{min-width:0;display:grid;justify-items:center;gap:5px;padding:9px 7px;border:1px solid #2c3d50;border-radius:11px;background:linear-gradient(145deg,#172536,#101925);text-align:center}
+.character-stage img{width:100%;height:105px;object-fit:contain}
+.character-stage strong{font-size:10px;color:#dce6ef}
+.character-stage small{font-size:7px;letter-spacing:.7px;color:#8ea1b5}
+.character-stage.future{opacity:.66}
+.character-stage.current{border-color:#c5a46b;background:linear-gradient(145deg,#302a20,#111c29);box-shadow:inset 0 0 18px #d5b36b12}
+.character-stage.current small{color:#e4c27d}
+.character-stage.unlocked:not(.current){border-color:#385c52}
+.rank-tier-0{filter:drop-shadow(0 2px 3px #aab8c522)}
+.rank-tier-1{filter:drop-shadow(0 3px 5px #c1845577)}
+.rank-tier-2{filter:drop-shadow(0 3px 7px #d1dce755)}
+.rank-tier-3{filter:drop-shadow(0 0 6px #e6bd6877) drop-shadow(0 4px 8px #0009)}
+.rank-tier-4{filter:drop-shadow(0 0 8px #b9d2df88) drop-shadow(0 0 15px #6a9fb044)}
+.rank-tier-5{filter:drop-shadow(0 0 9px #55c39b99) drop-shadow(0 0 20px #55c39b44)}
+.rank-tier-6{filter:drop-shadow(0 0 10px #83d9f2bb) drop-shadow(0 0 22px #24577988)}
+.rank-tier-7{filter:drop-shadow(0 0 11px #b39af0bb) drop-shadow(0 0 24px #45366d99)}
+.rank-tier-8{filter:drop-shadow(0 0 13px #e5c27bcc) drop-shadow(0 0 28px #e5c27b77)}
+.rank-tier-9{filter:drop-shadow(0 0 16px #fff0bf) drop-shadow(0 0 30px #f07b72cc) drop-shadow(0 0 48px #f07b7266)}
