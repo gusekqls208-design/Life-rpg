@@ -59,3 +59,38 @@
 .meal-summary .macro-carbs{color:var(--carbs);text-shadow:0 0 8px #65e6a533}
 .meal-summary .macro-protein{color:var(--protein);text-shadow:0 0 8px #65bfff33}
 .meal-summary .macro-fat{color:var(--fat);text-shadow:0 0 8px #ffad7033}
+
+/* Winter Arc workout progression recommendation */
+.recommendation{padding:15px;margin:12px 0 16px;background:linear-gradient(145deg,#142538,#101722);border:1px solid #365d78;border-radius:15px;box-shadow:0 0 18px #65bfff18}
+.recommendation-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.recommendation-head>div{display:grid;gap:4px}
+.recommendation-kicker{font-size:9px;letter-spacing:1.8px;color:var(--blue);font-weight:900}
+.recommendation-head>div>strong{font-size:13px;letter-spacing:1px}
+.recommendation-status{font-size:9px;font-weight:900;letter-spacing:.8px;padding:7px 9px;border-radius:99px;background:#1c2a38;color:var(--green);border:1px solid #365d78;white-space:nowrap}
+.recommendation-status.weight-up{color:var(--blue);box-shadow:0 0 10px #65bfff22}
+.recommendation-status.adjust-load{color:var(--orange);border-color:#72533b}
+.recommendation-status.build-reps{color:var(--green);border-color:#35634f}
+.recommendation-metrics{display:grid;grid-template-columns:1.15fr 1fr .65fr;gap:7px;margin-bottom:12px}
+.recommendation-metrics>div{min-width:0;padding:10px 8px;background:#0b1420;border:1px solid #26394d;border-radius:10px;display:flex;flex-direction:column;gap:6px}
+.recommendation-metrics>div>span{font-size:8px;letter-spacing:1.2px;color:var(--muted);font-weight:800}
+.recommendation-metrics>div>strong{font-size:clamp(12px,3.5vw,16px);line-height:1.25;overflow-wrap:anywhere}
+.rec-weight{color:var(--blue);text-shadow:0 0 10px #65bfff66}
+.rec-reps{color:var(--green);text-shadow:0 0 10px #65e6a555}
+.rec-sets{color:var(--orange);text-shadow:0 0 10px #ffad7055}
+.recommendation-set-list{display:grid;gap:5px;margin:0 0 12px}
+.recommendation-set{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;background:#0b1420;border:1px solid #223449;border-radius:9px}
+.recommendation-set>span{font-size:10px;color:var(--muted);letter-spacing:1px;font-weight:800}
+.recommendation-set>strong{display:flex;align-items:center;gap:8px;font-size:12px}
+.recommendation-set b{font-style:normal;color:var(--blue);text-shadow:0 0 8px #65bfff44}
+.recommendation-set i{font-style:normal;color:var(--muted);font-size:10px}
+.recommendation-set em{font-style:normal;color:var(--green);text-shadow:0 0 8px #65e6a544}
+.recommendation-note{font-size:10px;line-height:1.5;color:#a9bacb;margin:0 0 12px}
+.recommendation-previous{display:block;margin-top:9px;font-size:8px;line-height:1.5;letter-spacing:.4px;color:var(--muted)}
+/* Match HOME nutrition values to DIET accents */
+.home-calories{color:var(--text);text-shadow:0 0 8px #edf3f822}
+.home-protein{color:var(--protein);text-shadow:0 0 10px #65bfff55}
+/* Native-style fixed bottom navigation with safe-area support */
+.app-shell{padding-bottom:calc(env(safe-area-inset-bottom) + 104px)}
+.tabs{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(calc(100% - 24px),644px);margin:0;padding:5px 5px calc(env(safe-area-inset-bottom) + 5px);border-radius:16px 16px 0 0;background:#0d141ef2;border:1px solid #29394b;border-bottom:0;box-shadow:0 -8px 28px #0005;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.tab{padding:13px 4px}
+main{padding-bottom:14px}
