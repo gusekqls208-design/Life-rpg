@@ -133,6 +133,7 @@ function useSkill(i){const h=current();if(!h||!playerTurn)return;if(hasStatus(h,
   else if(h.id==='shadow'){if(i===0){d=applyHit(1);h.mark=Math.min(3,h.mark+1);}if(i===1){setStatus(h,'은신',1);h.boost=1;msg='그림자 은신!';}if(i===2){d=applyHit(2+h.mark*.2,{ignore:.2});h.mark=0;msg='약점 절단!';}if(i===3){d=applyHit(3.5+h.mark*.25);h.mark=0;h.ult=0;msg='심연의 처형!';}}
   else if(h.id==='soldier'){if(i===0)d=applyHit(1);if(i===1){h.gear--;d=applyHit(1.8);setStatus(enemyState,'약화',2);msg='전술 수류탄!';}if(i===2){h.gear--;h.barrier+=h.hp*.3;setStatus(h,'방탄',2);msg='방탄 전술!';}if(i===3){d=applyHit(3.5);h.gear=Math.min(2,h.gear+1);setStatus(h,'전술 방어',2);h.ult=0;msg='최종 작전!';}}
   if(i===3)h.ult=0;
+  if(i!==3)gainUlt(h,15);
   if(h.boost>0&&i!==1)h.boost=0;
   if(msg)addLog('<b>'+h.name+'</b> '+msg+' <span style="color:#e7c78f">'+(d?'피해 '+fmt(d):'')+'</span>');
   else addLog('<b>'+h.name+'</b> '+h.skills[i][1]+'! 피해 '+fmt(d));
@@ -153,7 +154,8 @@ function selectRoster(id){if(party.includes(id)){if(party.length===1){toast('파
 function startBattleVs(id){enemyId=id;restart();closeModal('enemyModal')}
 function bind(){document.addEventListener('click',e=>{const sk=e.target.closest('[data-skill]');if(sk){useSkill(Number(sk.dataset.skill));return}const sw=e.target.closest('[data-swap]');if(sw){swapTo(sw.dataset.swap);return}const ro=e.target.closest('[data-roster]');if(ro){selectRoster(ro.dataset.roster);return}const cl=e.target.closest('[data-close]');if(cl){closeModal(cl.dataset.close);return}const en=e.target.closest('[data-enemy]');if(en){startBattleVs(en.dataset.enemy);return}});
 $('swapOpen').onclick=()=>{if(hasStatus(current(),'속박')){toast('속박 상태에서는 교체할 수 없어.');return}$('swapChoices').innerHTML=party.filter(id=>id!==active).map(id=>{const h=playerState[id];return '<button class="enemy-choice" data-swap="'+id+'" '+(h.hpNow<=0?'disabled':'')+'><strong>'+h.name+'</strong><small>'+h.element+' · HP '+fmt(h.hpNow)+'/'+fmt(h.hp)+'</small></button>'}).join('');openModal('swapModal')};
-$('reloadBtn').onclick=()=>{const h=current();if(h.id!=='cowboy'||h.ammo>=6||!playerTurn||busy)return;playerAction(()=>{h.ammo=6;addLog('<b>재장전!</b> 리볼버 탄환을 6발 채웠다.')})};\n$('itemBtn').onclick=()=>{if(potions<=0||!playerTurn||busy)return;playerAction(()=>{const h=current();const heal=Math.min(h.hp-h.hpNow,h.hp*.35);h.hpNow+=heal;potions--;addLog('<b>회복 물약!</b> '+h.name+' HP '+fmt(heal)+' 회복.')})};
+$('reloadBtn').onclick=()=>{const h=current();if(h.id!=='cowboy'||h.ammo>=6||!playerTurn||busy)return;playerAction(()=>{h.ammo=6;addLog('<b>재장전!</b> 리볼버 탄환을 6발 채웠다.')})};
+$('itemBtn').onclick=()=>{if(potions<=0||!playerTurn||busy)return;playerAction(()=>{const h=current();const heal=Math.min(h.hp-h.hpNow,h.hp*.35);h.hpNow+=heal;potions--;addLog('<b>회복 물약!</b> '+h.name+' HP '+fmt(heal)+' 회복.')})};
 $('runBtn').onclick=()=>{if(!playerTurn||busy)return;battleOver=true;playerTurn=false;render();$('resultMark').textContent='↗';$('resultTitle').textContent='전투 포기';$('resultText').textContent='전투를 종료했어. 보상은 지급되지 않아.';$('resultModal').classList.add('show')};
 $('restartBtn').onclick=restart;$('resultRestart').onclick=restart;
 $('enemyOpen').onclick=()=>{$('enemyChoices').innerHTML=ENEMIES.map(e=>'<button class="enemy-choice" data-enemy="'+e.id+'"><strong>'+e.name+'</strong><small>'+e.element+' · Lv. '+e.level+' · HP '+fmt(e.hp)+'</small></button>').join('');openModal('enemyModal')};
