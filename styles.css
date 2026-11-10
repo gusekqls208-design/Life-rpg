@@ -584,3 +584,12 @@ button,a,select{touch-action:manipulation}
 .food-library-fields label{display:grid;gap:5px;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.5px}
 .food-library-fields input{width:100%;min-width:0;padding:10px 8px;border:1px solid var(--line);border-radius:8px;background:#111d2a;color:var(--text);font-size:13px}
 .food-library-item .wide{margin-top:10px}
+
+/* Food library list + detail editor */
+.food-library-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.food-library-toolbar .primary{white-space:nowrap;padding:0 13px;min-height:44px;font-size:11px}
+.food-library-list{display:grid;gap:0;max-height:58dvh;overflow:auto;border-top:1px solid var(--line)}
+.food-library-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto 14px;align-items:center;gap:9px;text-align:left;padding:14px 5px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.food-library-row-main{min-width:0;display:grid;gap:5px}.food-library-row-main strong{font-size:13px;overflow-wrap:anywhere}.food-library-row-main small,.food-library-row-macros small{font-size:9px;color:var(--muted)}
+.food-library-row-macros{display:grid;gap:4px;text-align:right}.food-library-row-macros b{font-size:11px;color:var(--accent)}.food-library-row-macros small{white-space:nowrap}.food-library-chevron{font-size:22px;color:var(--muted)}
+.food-library-editor{padding-top:3px}.food-library-back{border:0;background:transparent;color:var(--accent);font-size:12px;padding:8px 0;cursor:pointer}.food-library-editor h3{font-size:17px;margin:12px 0 16px}.food-library-editor .food-library-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.food-library-editor .food-library-fields label{font-size:10px}.food-library-editor .food-library-fields input{padding:12px 10px;font-size:14px}.food-library-save{margin-top:18px}.food-library-delete{margin-top:9px;min-height:42px}
