@@ -510,3 +510,7 @@ button,a,select{touch-action:manipulation}
 .diet-history-meal-foods{display:block;gap:0}
 
 .macro-remaining{display:block;margin-top:3px;font-size:9px!important;color:var(--muted)!important;letter-spacing:0!important;line-height:1.35;}
+
+
+/* Food quantity scaling · user-defined reference amount and unit */
+.food-quantity-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0 5px}.food-quantity-grid input{width:100%;min-width:0;padding:10px 8px;border:1px solid var(--line);border-radius:9px;background:#0d1621;color:var(--text);font-size:13px}.food-unit-hint,.food-calculated{margin:5px 0 9px;color:var(--muted);font-size:9px;line-height:1.5}.food-calculated{padding:9px 10px;border:1px solid #30485d;border-radius:9px;background:#101b28;color:#a9d8e9;font-weight:700}
