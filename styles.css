@@ -531,3 +531,14 @@ button,a,select{touch-action:manipulation}
 .food-base-grid{display:grid;grid-template-columns:1fr;gap:4px}
 .food-base-grid input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#0d1621;color:var(--text);font-size:13px}
 .food-base-grid .food-unit-hint{margin:2px 0 8px}
+
+
+/* Meal log: separate food name, intake amount, calories and macros */
+.meal-entry-redesigned{align-items:stretch;padding:11px 12px;gap:12px}
+.meal-entry-redesigned .meal-entry-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:6px}
+.meal-entry-redesigned .meal-entry-main>strong{font-size:12px;line-height:1.35;color:#e5eef6;overflow-wrap:anywhere}
+.meal-entry-meta{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.meal-entry-meta .meal-entry-quantity{font-size:10px;color:#91a5b8;font-weight:500}
+.meal-entry-meta>b{font-size:11px;color:#d9e8f3;font-weight:750;white-space:nowrap}
+.meal-entry-macros{display:flex;align-items:center;gap:13px;flex-wrap:wrap;font-size:9px;font-weight:650}
+.meal-entry-macros span{white-space:nowrap}
