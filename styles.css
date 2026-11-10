@@ -542,3 +542,14 @@ button,a,select{touch-action:manipulation}
 .meal-entry-meta>b{font-size:11px;color:#d9e8f3;font-weight:750;white-space:nowrap}
 .meal-entry-macros{display:flex;align-items:center;gap:13px;flex-wrap:wrap;font-size:9px;font-weight:650}
 .meal-entry-macros span{white-space:nowrap}
+
+/* v30 · expandable habit completion history */
+.habit-history-entry{display:grid;gap:0}
+.habit-history-row{width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 13px;background:#111c29;border:1px solid #2c3d50;border-radius:9px;color:#b8c7d5;font-size:11px;text-align:left;cursor:pointer}
+.habit-history-row span{display:flex;align-items:center;gap:9px;color:#91a4b8}
+.habit-history-row i{font-style:normal;color:#83c9e8;font-size:15px;transition:transform .18s}
+.habit-history-row[aria-expanded="true"]{border-color:#52718a;border-radius:9px 9px 0 0}
+.habit-history-row[aria-expanded="true"] i{transform:rotate(180deg)}
+.habit-history-details{list-style:none;display:grid;gap:8px;margin:0;padding:11px 13px;background:#0c1520;border:1px solid #2c3d50;border-top:0;border-radius:0 0 9px 9px}
+.habit-history-details li{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#d5e1eb;font-size:11px}
+.habit-history-details li small{color:#83c9e8;font-size:10px;white-space:nowrap}
