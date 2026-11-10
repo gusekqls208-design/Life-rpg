@@ -514,3 +514,20 @@ button,a,select{touch-action:manipulation}
 
 /* Food quantity scaling · user-defined reference amount and unit */
 .food-quantity-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0 5px}.food-quantity-grid input{width:100%;min-width:0;padding:10px 8px;border:1px solid var(--line);border-radius:9px;background:#0d1621;color:var(--text);font-size:13px}.food-unit-hint,.food-calculated{margin:5px 0 9px;color:var(--muted);font-size:9px;line-height:1.5}.food-calculated{padding:9px 10px;border:1px solid #30485d;border-radius:9px;background:#101b28;color:#a9d8e9;font-weight:700}
+
+
+/* Food logging: emphasize the frequently edited eaten quantity */
+.food-quantity-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:10px;margin:12px 0 10px;align-items:end}
+.food-quantity-grid input{width:100%;min-width:0;min-height:52px;padding:12px;border:1px solid var(--line);border-radius:11px;background:#0d1621;color:var(--text);font-size:20px;font-weight:750}
+.food-amount-field input{text-align:center;font-size:25px;color:#b9e8fb;border-color:#42647a}
+.food-unit-field input{text-align:center;font-size:16px;font-weight:650}
+.food-base-settings{margin:8px 0 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.018);overflow:hidden}
+.food-base-settings summary{padding:12px 13px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;list-style:none}
+.food-base-settings summary::-webkit-details-marker{display:none}
+.food-base-settings summary:after{content:"＋";float:right;color:var(--muted)}
+.food-base-settings[open] summary:after{content:"−"}
+.food-base-settings summary span{display:block;margin-top:3px;font-size:9px;font-weight:400;opacity:.8}
+.food-base-inner{padding:0 12px 12px}
+.food-base-grid{display:grid;grid-template-columns:1fr;gap:4px}
+.food-base-grid input{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:#0d1621;color:var(--text);font-size:13px}
+.food-base-grid .food-unit-hint{margin:2px 0 8px}
