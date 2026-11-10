@@ -1,8 +1,8 @@
-const CACHE='life-rpg-winter-arc-v44';
+const CACHE='life-rpg-winter-arc-v45';
 const FILES=[
   './','./index.html',
   './styles.css','./styles.css?v=31',
-  './app.js','./app.js?v=37',
+  './app.js','./app.js?v=38',
   './manifest.webmanifest','./placeholder.svg','./icon.svg',
   './stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png',
   './stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png',
@@ -23,14 +23,13 @@ self.addEventListener('activate',event=>{
     const keys=await caches.keys();
     await Promise.all(keys.filter(key=>key.startsWith('life-rpg-winter-arc-')&&key!==CACHE).map(key=>caches.delete(key)));
     await self.clients.claim();
-    // Reload already-open standalone/PWA clients after the new worker activates.
-    const clients = await self.clients.matchAll({type:'window', includeUncontrolled:true});
-    await Promise.all(clients.map(client => client.navigate(client.url).catch(()=>null)));
   })());
 });
 
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
+  const url=new URL(event.request.url);
+  const isAppAsset=url.pathname.endsWith('/app.js')||url.pathname.endsWith('/styles.css');
 
   if(event.request.mode==='navigate'){
     event.respondWith(fetch(event.request).then(response=>{
@@ -40,6 +39,17 @@ self.addEventListener('fetch',event=>{
       }
       return response;
     }).catch(()=>caches.match(new URL('./index.html',self.registration.scope).toString())));
+    return;
+  }
+
+  if(isAppAsset){
+    event.respondWith(fetch(event.request).then(response=>{
+      if(response&&response.ok){
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+      }
+      return response;
+    }).catch(()=>caches.match(event.request)));
     return;
   }
 
