@@ -1,8 +1,8 @@
-const CACHE='life-rpg-winter-arc-v41';
+const CACHE='life-rpg-winter-arc-v42';
 const FILES=[
   './','./index.html',
-  './styles.css','./styles.css?v=29',
-  './app.js','./app.js?v=34',
+  './styles.css','./styles.css?v=30',
+  './app.js','./app.js?v=35',
   './manifest.webmanifest','./placeholder.svg','./icon.svg',
   './stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png',
   './stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png',
