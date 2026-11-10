@@ -1,4 +1,4 @@
-const CACHE='life-rpg-winter-arc-v40';
+const CACHE='life-rpg-winter-arc-v41';
 const FILES=[
   './','./index.html',
   './styles.css','./styles.css?v=29',
@@ -23,6 +23,9 @@ self.addEventListener('activate',event=>{
     const keys=await caches.keys();
     await Promise.all(keys.filter(key=>key.startsWith('life-rpg-winter-arc-')&&key!==CACHE).map(key=>caches.delete(key)));
     await self.clients.claim();
+    // Reload already-open standalone/PWA clients after the new worker activates.
+    const clients = await self.clients.matchAll({type:'window', includeUncontrolled:true});
+    await Promise.all(clients.map(client => client.navigate(client.url).catch(()=>null)));
   })());
 });
 
