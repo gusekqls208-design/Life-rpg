@@ -1,5 +1,14 @@
-const CACHE='life-rpg-winter-arc-v36';
-const FILES=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./placeholder.svg','./icon.svg','./stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png','./stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png','./stage07_cutout.png','./stage08_cutout.png','./stage09_cutout.png','./stage10_cutout.png'];
+const CACHE='life-rpg-winter-arc-v37';
+const FILES=[
+  './','./index.html',
+  './styles.css','./styles.css?v=27',
+  './app.js','./app.js?v=31',
+  './manifest.webmanifest','./placeholder.svg','./icon.svg',
+  './stage01_cutout.png','./stage02_cutout.png','./stage03_cutout.png',
+  './stage04_cutout.png','./stage05_cutout.png','./stage06_cutout.png',
+  './stage07_cutout.png','./stage08_cutout.png','./stage09_cutout.png',
+  './stage10_cutout.png'
+];
 
 self.addEventListener('install',event=>{
   event.waitUntil((async()=>{
@@ -20,8 +29,6 @@ self.addEventListener('activate',event=>{
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
 
-  // Always check the network first for page navigations so Safari's
-  // clean GitHub Pages URL does not keep serving an old cached index.
   if(event.request.mode==='navigate'){
     event.respondWith(fetch(event.request).then(response=>{
       if(response&&response.ok){
